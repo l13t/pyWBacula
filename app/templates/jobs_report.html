@@ -1,0 +1,44 @@
+{%- include 'header.html' %}
+
+    <div class="ui large center aligned menu">
+      <a class="item">test</a>
+      <a class="item">test</a>
+      <a class="item">test</a>
+      <a class="item">test</a>
+      <div class="right menu">
+        <div class="right item">
+          <a class="ui button">Submit</a>
+        </div>
+      </div>
+    </div>
+
+<div class="ui vertical stripe segment">
+  <div class="ui middle aligned stackable grid container">
+    <div class="row">
+      <div class="column">
+        <table class="ui left aligned celled table">
+          <thead>
+            <tr>
+              <th>JobID</th>
+              <th>Job Name</th>
+              <th>Client Name</th>
+              <th>Job Size</th>
+            </tr>
+          </thead>
+          <tbody>
+    {%- for job in jobs %}
+            <tr>
+              <td class="right aligned">{{ job['Job_JobId'] }}</td>
+              <td class="left aligned">{{ job['Job_Name'] }}</td>
+              <td class="left aligned">{{ job['Client_Name'] }}</td>
+              <td class="left aligned">{{ job['Job_JobBytes'] }}</td>
+            </tr>
+    {%- endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+{%- include 'footer.html' %}

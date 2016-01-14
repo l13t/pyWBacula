@@ -1,3 +1,35 @@
 {%- include 'header.html' %}
-Test page
+
+<div class="ui two column stackable grid">
+  <div class="column">
+{% line_chart b_size with library={ "xAxis":{"title":{"text":"Date period"}}, "yAxis":{"title":{"text":"Backup size in Bytes"}}, "title": {"text": "Bacula backup sizes"} } %}
+{% line_chart b_count with library={ "xAxis":{"title":{"text":"Date period"}}, "yAxis":{"title":{"text":"Files count in backup"}}, "title": {"text": "Bacula backup files count"}} %}
+  </div>
+  <div class="column">
+    <h3>
+      Backup for last 24 hours
+    </h3>
+    <table class="ui striped right aligned table">
+      <thead>
+        <tr>
+          <th class="left aligned">Client name (Job name)</th>
+          <th>Backup date</th>
+          <th>Files count</th>
+          <th>Backup size (MB)</th>
+        </tr>
+      </thead>
+      <tbody>
+    {% for backup in last_backup %}
+        <tr>
+          <td class="left aligned">{{ backup['name'] }}</td>
+          <td>{{ backup['date'] }}</td>
+          <td>{{ backup['files'] }}</td>
+          <td>{{ backup['size'] }}</td>
+        </tr>
+    {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
 {%- include 'footer.html' %}

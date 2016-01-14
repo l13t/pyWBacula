@@ -1,0 +1,36 @@
+{%- include 'header.html' %}
+
+<div class="ui vertical stripe segment">
+  <div class="ui middle aligned stackable grid container">
+    <div class="row">
+      <div class="eight wide column">
+        <form method="post" action="/reports/jobs">
+          <input type="hidden" name="" value="">
+          <input type="submit" class="ui button" value="Show jobs report">
+        </form>
+      </div>
+      <div class="eight wide column">
+        <form method="post" action="/reports/big_files">
+          <input type="hidden" name="" value="">
+          <input type="submit" class="ui button" value="Show big files report">
+        </form>
+      </div>
+    </div>
+    <div class="row">
+      <div class="eight wide column">
+        <form method="post" action="/reports/pool_size_report">
+          <input type="hidden" name="" value="">
+          <input type="submit" class="ui button" value="Show pools size report">
+        </form>
+      </div>
+      <div class="eight wide column">
+        <form method="post" action="/reports/big_files">
+          <input type="hidden" name="" value="">
+          <input type="submit" class="ui button" value="Show big files report">
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+{%- include 'footer.html' %}

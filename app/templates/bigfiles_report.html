@@ -1,0 +1,37 @@
+{%- include 'header.html' %}
+
+<div class="ui vertical stripe segment">
+  {% for job_name, job_data in bf_report.items() %}
+    {% if job_data != [] %}
+  <div class="ui middle aligned stackable grid container">
+    <div class="row">
+      <div class="column">
+        <h2>{{ job_name }} has big files in last backup</h2>
+        <table class="ui left aligned celled table">
+          <thead>
+            <tr>
+              <th>Filename</th>
+              <th>Owner (uid:gid)</th>
+              <th>Size in MBytes</th>
+              <th>Last modified time</th>
+            </tr>
+          </thead>
+          <tbody>
+      {% for job in job_data %}
+            <tr>
+              <td class="left aligned">{{ job['fname'] }}</td>
+              <td class="left aligned">{{ job['uid'] }}:{{ job['gid'] }}</td>
+              <td class="right aligned">{{ job['size'] }}</td>
+              <td class="left aligned">{{ job['mtime'] }}</td>
+            </tr>
+      {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+    {% endif %}
+  {% endfor %}
+</div>
+
+{%- include 'footer.html' %}

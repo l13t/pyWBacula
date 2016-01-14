@@ -1,30 +1,77 @@
 <html>
   <head>
     <title>pyWBacula | {{ title }}</title>
+    <link rel="shortcut icon" href="/static/img/bacula.png">
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 
-  <link rel="stylesheet" type="text/css" href="static/dist/components/reset.css">
-  <link rel="stylesheet" type="text/css" href="static/dist/components/site.css">
+  <link rel="stylesheet" type="text/css" href="/static/dist/components/accordion.css">
+  <link rel="stylesheet" type="text/css" href="/static/dist/components/ad.css">
+  <link rel="stylesheet" type="text/css" href="/static/dist/components/breadcrumb.css">
+  <link rel="stylesheet" type="text/css" href="/static/dist/components/button.css">
+  <link rel="stylesheet" type="text/css" href="/static/dist/components/card.css">
+  <link rel="stylesheet" type="text/css" href="/static/dist/components/checkbox.css">
+  <link rel="stylesheet" type="text/css" href="/static/dist/components/comment.css">
+  <link rel="stylesheet" type="text/css" href="/static/dist/components/container.css">
+  <link rel="stylesheet" type="text/css" href="/static/dist/components/dimmer.css">
+  <link rel="stylesheet" type="text/css" href="/static/dist/components/divider.css">
+  <link rel="stylesheet" type="text/css" href="/static/dist/components/dropdown.css">
+  <link rel="stylesheet" type="text/css" href="/static/dist/components/embed.css">
+  <link rel="stylesheet" type="text/css" href="/static/dist/components/feed.css">
+  <link rel="stylesheet" type="text/css" href="/static/dist/components/flag.css">
+  <link rel="stylesheet" type="text/css" href="/static/dist/components/form.css">
+  <link rel="stylesheet" type="text/css" href="/static/dist/components/grid.css">
+  <link rel="stylesheet" type="text/css" href="/static/dist/components/header.css">
+  <link rel="stylesheet" type="text/css" href="/static/dist/components/icon.css">
+  <link rel="stylesheet" type="text/css" href="/static/dist/components/image.css">
+  <link rel="stylesheet" type="text/css" href="/static/dist/components/input.css">
+  <link rel="stylesheet" type="text/css" href="/static/dist/components/item.css">
+  <link rel="stylesheet" type="text/css" href="/static/dist/components/label.css">
+  <link rel="stylesheet" type="text/css" href="/static/dist/components/list.css">
+  <link rel="stylesheet" type="text/css" href="/static/dist/components/loader.css">
+  <link rel="stylesheet" type="text/css" href="/static/dist/components/menu.css">
+  <link rel="stylesheet" type="text/css" href="/static/dist/components/message.css">
+  <link rel="stylesheet" type="text/css" href="/static/dist/components/modal.css">
+  <link rel="stylesheet" type="text/css" href="/static/dist/components/nag.css">
+  <link rel="stylesheet" type="text/css" href="/static/dist/components/popup.css">
+  <link rel="stylesheet" type="text/css" href="/static/dist/components/progress.css">
+  <link rel="stylesheet" type="text/css" href="/static/dist/components/rail.css">
+  <link rel="stylesheet" type="text/css" href="/static/dist/components/rating.css">
+  <link rel="stylesheet" type="text/css" href="/static/dist/components/reset.css">
+  <link rel="stylesheet" type="text/css" href="/static/dist/components/reveal.css">
+  <link rel="stylesheet" type="text/css" href="/static/dist/components/search.css">
+  <link rel="stylesheet" type="text/css" href="/static/dist/components/segment.css">
+  <link rel="stylesheet" type="text/css" href="/static/dist/components/shape.css">
+  <link rel="stylesheet" type="text/css" href="/static/dist/components/sidebar.css">
+  <link rel="stylesheet" type="text/css" href="/static/dist/components/site.css">
+  <link rel="stylesheet" type="text/css" href="/static/dist/components/statistic.css">
+  <link rel="stylesheet" type="text/css" href="/static/dist/components/step.css">
+  <link rel="stylesheet" type="text/css" href="/static/dist/components/sticky.css">
+  <link rel="stylesheet" type="text/css" href="/static/dist/components/tab.css">
+  <link rel="stylesheet" type="text/css" href="/static/dist/components/table.css">
+  <link rel="stylesheet" type="text/css" href="/static/dist/components/transition.css">
+  <link rel="stylesheet" type="text/css" href="/static/dist/components/video.css">
 
-  <link rel="stylesheet" type="text/css" href="static/dist/components/container.css">
-  <link rel="stylesheet" type="text/css" href="static/dist/components/grid.css">
-  <link rel="stylesheet" type="text/css" href="static/dist/components/header.css">
-  <link rel="stylesheet" type="text/css" href="static/dist/components/image.css">
-  <link rel="stylesheet" type="text/css" href="static/dist/components/menu.css">
-
-  <link rel="stylesheet" type="text/css" href="static/dist/components/divider.css">
-  <link rel="stylesheet" type="text/css" href="static/dist/components/dropdown.css">
-  <link rel="stylesheet" type="text/css" href="static/dist/components/segment.css">
-  <link rel="stylesheet" type="text/css" href="static/dist/components/button.css">
-  <link rel="stylesheet" type="text/css" href="static/dist/components/list.css">
-  <link rel="stylesheet" type="text/css" href="static/dist/components/icon.css">
-  <link rel="stylesheet" type="text/css" href="static/dist/components/sidebar.css">
-  <link rel="stylesheet" type="text/css" href="static/dist/components/transition.css">
+  <!--- Component JS -->
+  <script src="/static/assets/library/jquery.min.js"></script>
+  <script src="/static/assets/library/iframe-content.js"></script>
+  <script type="text/javascript" src="/static/dist/components/popup.js"></script>
+  <script type="text/javascript" src="/static/dist/components/dropdown.js"></script>
+  <script type="text/javascript" src="/static/dist/components/transition.js"></script>
 
   <style type="text/css">
+
+  body {
+    padding: 1em;
+  }
+  .ui.menu {
+    margin: 3em 0em;
+  }
+  .ui.menu:last-child {
+    margin-bottom: 110px;
+  }
 
     .hidden.menu {
       display: none;
@@ -114,10 +161,12 @@
 
   </style>
 
-  <script src="assets/library/jquery.min.js"></script>
-  <script src="static/dist/components/visibility.js"></script>
-  <script src="static/dist/components/sidebar.js"></script>
-  <script src="static/dist/components/transition.js"></script>
+  <script src="/static/assets/library/jquery.min.js"></script>
+  <script src="/static/dist/components/visibility.js"></script>
+  <script src="/static/dist/components/sidebar.js"></script>
+  <script src="/static/dist/components/transition.js"></script>
+  <script src="/static/dist/components/form.js"></script>
+  <script src="/static/dist/components/transition.js"></script>
   <script>
   $(document)
     .ready(function() {
@@ -140,40 +189,39 @@
         .sidebar('attach events', '.toc.item')
       ;
 
+      $('.ui.menu .ui.dropdown').dropdown({
+        on: 'hover'
+      });
+      $('.ui.menu a.item')
+        .on('click', function() {
+          $(this)
+            .addClass('active')
+            .siblings()
+            .removeClass('active')
+          ;
+        })
+      ;
     })
   ;
   </script>
 
+
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+  <script src="http://code.highcharts.com/highcharts.js"></script>
+  <script src="/ck/static/chartkick.js"></script>
+
+
   </head>
   <body>
-    <div class="ui large top fixed hidden menu">
-      <div class="ui container">
-        <a href="#" class="item">pyWBacula Home</a>
-        <a href="#" class="item">Reports</a>
-        <div class="right menu">
-          <div class="item">
-            <a class="ui button">Log in</a>
-          </div>
-          <div class="item">
-            <a href="/about" class="ui primary button">About</a>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="ui inverted vertical center aligned segment">
-      <div class="ui container">
-        <div class="ui large secondary inverted menu">
+        <div class="ui large inverted menu">
           <a href="/home" class="item">pyWBacula Home</a>
-          <a href="/reports" class="item">Reports</a>
+          <a href="/reports" class="item">Reports list</a>
           <div class="right menu">
             <div class="right item">
-              <a href="log_in" class="ui inverted button">Log in</a>
+              <a href="/login" class="ui inverted button">Log in</a>
             </div>
             <div class="right item">
               <a href="/about" class="ui inverted button">About</a>
             </div>
           </div>
         </div>
-      </div>
-    </div>

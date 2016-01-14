@@ -1,0 +1,37 @@
+{%- include 'header.html' %}
+
+<div class="ui vertical stripe segment">
+  <div class="ui center aligned stackable grid container">
+    <div class="row">
+      <div class="eight wide column center aligned grid">
+        <form class="ui large form" action="/api/login" method="post">
+          <div class="ui stacked segment">
+            <div class="field">
+              <div class="ui labeled input">
+                <a class="ui label">
+                  Login: 
+                </a>
+                <input type="text" name="email" placeholder="Login">
+              </div>
+            </div>
+            <div class="ui divider inverted"></div>
+            <div class="row">
+              <div class="field">
+                <div class="ui labeled input">
+                  <a class="ui label">
+                    Password: 
+                  </a>
+                  <input type="password" name="password" placeholder="Password">
+                </div>
+              </div>
+            </div>
+            <div class="ui divider inverted"></div>
+            <input class="ui secondary submit button" type="submit" value="Login"></input>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+{%- include 'footer.html' %}
