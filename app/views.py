@@ -22,16 +22,28 @@ def favicon():
 @app.route('/')
 @app.route('/home')
 def index():
-  s = select([jobhist.c.name, jobhist.c.schedtime, jobhist.c.jobbytes], use_labels=True).where(jobhist.c.schedtime > (date.today() - timedelta(days=28)))
-  result = db.execute(s).fetchall()
-  b_s_result = gen_chart_array_time_3d(result)
-  s = select([jobhist.c.name, jobhist.c.schedtime, jobhist.c.jobfiles], use_labels=True).where(jobhist.c.schedtime > (date.today() - timedelta(days=28)))
-  result = db.execute(s).fetchall()
-  b_c_result = gen_chart_array_time_3d(result)
-  s = select([client.c.name, job.c.name, job.c.schedtime, job.c.jobfiles, job.c.jobbytes],  use_labels=True).where(and_(job.c.schedtime > (datetime.now() - timedelta(hours=24)), client.c.clientid == job.c.clientid)).order_by(job.c.name)
-  result = db.execute(s).fetchall()
-  detailed_result_last_day = [{'name': str(k)+" ("+str(x)+")", 'date': y.strftime('%Y-%m-%d'), 'files': int(z), 'size': sizeof_fmt(int(i))} for k, x, y, z, i in result]
-  return render_template("index.html", title='Home page', b_size=b_s_result, b_count=b_c_result, last_backup=detailed_result_last_day)
+  #s = select([jobhist.c.name, jobhist.c.schedtime, jobhist.c.jobbytes], use_labels=True).where(jobhist.c.schedtime > (date.today() - timedelta(days=28)))
+  #result = db.execute(s).fetchall()
+  #b_s_result = gen_chart_array_time_3d(result)
+  #s = select([jobhist.c.name, jobhist.c.schedtime, jobhist.c.jobfiles], use_labels=True).where(jobhist.c.schedtime > (date.today() - timedelta(days=28)))
+  #result = db.execute(s).fetchall()
+  #b_c_result = gen_chart_array_time_3d(result)
+  s1 = select([client.c.name, job.c.name, job.c.jobstatus, job.c.schedtime, job.c.jobfiles, job.c.jobbytes],  use_labels=True).where(and_(client.c.clientid == job.c.clientid, jobhist.c.schedtime > date.today() - timedelta(days=56)))
+  s2 = select([client.c.name, jobhist.c.name.label('job_name'), jobhist.c.jobstatus, jobhist.c.schedtime, jobhist.c.jobfiles, jobhist.c.jobbytes],  use_labels=True).where(and_(client.c.clientid == jobhist.c.clientid, jobhist.c.schedtime > date.today() - timedelta(days=56)))
+  query = s1.union(s2).alias('job_name')
+  result = db.execute(query).fetchall()
+  b_s_res = []
+  b_c_res = []
+  detailed_result_last_day = []
+  for j, tmp in enumerate(result):
+    k,x,st,y,z,i = tmp
+    b_s_res.append( (k, y, i) )
+    b_c_res.append( (k, y, z) )
+    if y > datetime.now() - timedelta(hours=24):
+      detailed_result_last_day.append({'name': str(k)+" ("+str(x)+")", 'date': y.strftime('%Y-%m-%d'), 'files': int(z), 'size': sizeof_fmt(int(i))})
+  b_s_result = gen_chart_array_time_3d(b_s_res)
+  b_c_result = gen_chart_array_time_3d(b_c_res)
+  return render_template("index.html", title='Home page', b_size=b_s_result, b_count=b_c_result, last_backup=detailed_result_last_day, tmp=result)
 
 @app.route('/login')
 def login():
