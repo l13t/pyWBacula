@@ -2,18 +2,15 @@
 from flask import render_template, request, send_from_directory, Flask, jsonify
 from app import app
 from app import db
-from sqlalchemy import desc, asc
+from sqlalchemy import desc, asc, cast, Date
 from sqlalchemy.sql import and_, or_, not_, select, func
 import os
 from datetime import time, datetime, date, timedelta
 from time import gmtime, strftime
 from database import *
 from lib import *
+import static_vars
 #### End of import section ####
-
-import logging
-logging.basicConfig()
-logging.getLogger('sqlalchemy.engine').setLevel(logging.INFO)
 
 @app.route('/favicon.ico')
 def favicon():
@@ -22,12 +19,6 @@ def favicon():
 @app.route('/')
 @app.route('/home')
 def index():
-  #s = select([jobhist.c.name, jobhist.c.schedtime, jobhist.c.jobbytes], use_labels=True).where(jobhist.c.schedtime > (date.today() - timedelta(days=28)))
-  #result = db.execute(s).fetchall()
-  #b_s_result = gen_chart_array_time_3d(result)
-  #s = select([jobhist.c.name, jobhist.c.schedtime, jobhist.c.jobfiles], use_labels=True).where(jobhist.c.schedtime > (date.today() - timedelta(days=28)))
-  #result = db.execute(s).fetchall()
-  #b_c_result = gen_chart_array_time_3d(result)
   s1 = select([client.c.name, job.c.name, job.c.jobstatus, job.c.schedtime, job.c.jobfiles, job.c.jobbytes],  use_labels=True).where(and_(client.c.clientid == job.c.clientid, jobhist.c.schedtime > date.today() - timedelta(days=56)))
   s2 = select([client.c.name, jobhist.c.name.label('job_name'), jobhist.c.jobstatus, jobhist.c.schedtime, jobhist.c.jobfiles, jobhist.c.jobbytes],  use_labels=True).where(and_(client.c.clientid == jobhist.c.clientid, jobhist.c.schedtime > date.today() - timedelta(days=56)))
   query = s1.union(s2).alias('job_name')
@@ -40,24 +31,18 @@ def index():
     b_s_res.append( (k, y, i) )
     b_c_res.append( (k, y, z) )
     if y > datetime.now() - timedelta(hours=24):
-      detailed_result_last_day.append({'name': str(k)+" ("+str(x)+")", 'date': y.strftime('%Y-%m-%d'), 'files': int(z), 'size': sizeof_fmt(int(i))})
+      detailed_result_last_day.append({'name': str(k), 'bak_name': str(x), 'date': y.strftime('%Y-%m-%d %H:%M:%S'), 'files': int(z), 'size': sizeof_fmt(int(i)), 'status': static_vars.JobStatus[st]})
   b_s_result = gen_chart_array_time_3d(b_s_res)
   b_c_result = gen_chart_array_time_3d(b_c_res)
   return render_template("index.html", title='Home page', b_size=b_s_result, b_count=b_c_result, last_backup=detailed_result_last_day, tmp=result)
 
-@app.route('/login')
-def login():
-  return render_template("login.html", title='Login to statistics page')
-
-@app.route('/api/login', methods=['POST'])
-def check_login():
-  login=request.form["login"]
-  pwd=request.form["pwd"]
-  return "Hello, %s !" % auth.username()
-
 @app.errorhandler(404)
 def page_not_found(e):
   return render_template('404.html', title="Page not found"), 404
+
+@app.route('/about')
+def about_page():
+  return render_template('about.html', title="About page")
 
 @app.route('/reports')
 def reports():
@@ -115,3 +100,100 @@ def pool_size_report():
   result = db.execute(s).fetchall()
   s_s_result = gen_chart_array_time_3d(result)
   return render_template("pool_size.html", title='Pool size report', p_size=p_s_result, s_size = s_s_result, res=result)
+
+@app.route('/reports/client/<host_name>/<bdate>')
+def client_detailed_info(host_name, bdate):
+  s = select([client.c.name, job.c.name, job.c.jobstatus, job.c.schedtime, job.c.jobfiles, job.c.jobbytes, job.c.jobid],  use_labels=True).where(and_(client.c.clientid == job.c.clientid, cast(job.c.schedtime,Date) == bdate, job.c.name == host_name, job.c.schedtime == bdate))
+  _short_res = db.execute(s).fetchall()
+  short_res = []
+  for i, _short in enumerate(_short_res):
+    c_name = _short[0]
+    j_name = _short[1]
+    j_status = _short[2]
+    j_schedtime = _short[3]
+    j_files = _short[4]
+    j_bytes = _short[5]
+    j_id = _short[6]
+    f_sel = select([path.c.path, filename.c.name, files.c.lstat]).where(
+        and_(
+            job.c.name == host_name,
+            job.c.jobid == files.c.jobid,
+            job.c.schedtime == bdate,
+            filename.c.filenameid == files.c.filenameid,
+            path.c.pathid == files.c.pathid
+            )
+        )
+    f_res = db.execute(f_sel).fetchall()
+    backup_files_list = []
+    for record in f_res:
+      backup_files_list.append(decode_file_info(record))
+    short_res.append({
+      'id': int(j_id),
+      'cname': c_name,
+      'jname': j_name,
+      'jstatus': static_vars.JobStatus[j_status],
+      'jschedtime': j_schedtime.strftime('%Y-%m-%d %H:%M:%S'),
+      'files': int(j_files),
+      'size': sizeof_fmt(int(j_bytes)),
+      'files_list': backup_files_list,
+    })
+  s1 = select([client.c.name, job.c.name, job.c.schedtime, job.c.jobfiles, job.c.jobbytes],  use_labels=True).where(and_(client.c.clientid == job.c.clientid, jobhist.c.schedtime > date.today() - timedelta(days=14), job.c.name == host_name))
+  s2 = select([client.c.name, jobhist.c.name.label('job_name'), jobhist.c.schedtime, jobhist.c.jobfiles, jobhist.c.jobbytes],  use_labels=True).where(and_(client.c.clientid == jobhist.c.clientid, jobhist.c.schedtime > date.today() - timedelta(days=14), jobhist.c.name == host_name))
+  query = s1.union(s2).alias('job_name')
+  result = db.execute(query).fetchall()
+  b_s_res = []
+  b_c_res = []
+  for j, tmp in enumerate(result):
+    k,x,y,z,i = tmp
+    b_s_res.append( (k, y, i) )
+    b_c_res.append( (k, y, z) )
+  b_s_result = b_c_result = []
+  b_s_result = gen_chart_array_time_3d(b_s_res)
+  b_c_result = gen_chart_array_time_3d(b_c_res)
+  return render_template("client.html", title='Detailed information for '+host_name, short_info=short_res, query=s, size_result=b_s_result, fcount_result=b_c_result)
+
+@app.route('/reports/long_running_backup', methods=['POST'])
+def long_running_backups():
+  s = select([
+      client.c.name,
+      job.c.name,
+      job.c.jobstatus,
+      job.c.schedtime,
+      job.c.starttime,
+      job.c.endtime,
+      job.c.jobfiles,
+      job.c.jobbytes,
+      job.c.jobid
+    ]).where(
+    and_(
+      job.c.schedtime > datetime.now() - timedelta(hours=24),
+      client.c.clientid == job.c.clientid,
+      job.c.starttime + timedelta(minutes=30) < job.c.endtime
+      )
+    )
+  result = db.execute(s).fetchall()
+  long_job = []
+  for j, tmp in enumerate(result):
+    cname = tmp[0]
+    jname = tmp[1]
+    jstatus = tmp[2]
+    jsched = tmp[3]
+    jstart = tmp[4]
+    jend = tmp[5]
+    jfiles = tmp[6]
+    jbytes = tmp[7]
+    jid = tmp[8]
+    jduration = jend - jstart
+    long_job.append({
+      'cname': cname,
+      'jname': jname,
+      'jstatus': static_vars.JobStatus[jstatus],
+      'jsched': jsched.strftime('%Y-%m-%d %H:%M:%S'),
+      'jstart': jstart.strftime('%Y-%m-%d %H:%M:%S'),
+      'jend': jend.strftime('%Y-%m-%d %H:%M:%S'),
+      'jduration': jduration,
+      'jfiles': int(jfiles),
+      'jbytes': sizeof_fmt(int(jbytes)),
+      'jid': int(jid),
+    })
+  return render_template('long_running_backups.html', title="Backups which run more than 30 minutes", long_job=long_job)

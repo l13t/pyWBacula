@@ -1,0 +1,89 @@
+{%- include 'header.html' %}
+
+<script src="/static/dist/components/tab.js"></script>
+<script src="/static/sinon.js"></script>
+<script type="text/javascript">// <![CDATA[
+$( document ).ready(function() {
+
+    // initialize both popups inline
+    $('.demo.menu .item').tab({ history: false });
+
+    });
+// ]]></script>
+
+<div class="ui two column stackable grid">
+  <div class="row">
+    <div class="four wide column">
+      {% line_chart size_result with library={ "xAxis":{"title":{"text":"Date period"}}, "yAxis":{"title":{"text":"Backup size in Bytes"}}, "title": {"text": "Bacula backup sizes for last 14 days"} } %}
+      {% line_chart fcount_result with library={ "xAxis":{"title":{"text":"Date period"}}, "yAxis":{"title":{"text":"Files count in backup"}}, "title": {"text": "Bacula backup files count for last 14 days"}} %}
+    </div>
+    <div class="twelve wide column">
+      <div class="ui pointing secondary demo menu">
+            {% set flag = True %}
+            {% set flag_time = [] %}
+            {% for res_data in short_info %}
+            <a class="item{% if flag %}{% do flag_time.append(res_data['jschedtime']) %} active{% set flag = False %}{% endif %}" data-tab="{{ res_data['jschedtime'] }}">{{ res_data['jschedtime'] }}</a>
+            {% endfor %}
+      </div>
+      {% for res_data in short_info %}
+      <div class="ui{% if res_data['jschedtime'] in flag_time %} active{% endif %} tab segment" data-tab="{{ res_data['jschedtime'] }}">
+        <table class="ui definition celled right aligned table" width="200px">
+          <tbody>
+          <tr>
+              <td class="left aligned four wide">Client Name</td>
+              <td class="left aligned">{{ res_data['cname'] }}</td>
+            </tr>
+            <tr>
+              <td class="left aligned four wide">Job Name</td>
+              <td class="left aligned">{{ res_data['jname'] }}</td>
+            </tr>
+            <tr>
+              <td class="left aligned four wide">Job Run Status</td>
+              <td class="left aligned">{{ res_data['jstatus'] }}</td>
+            </tr>
+            <tr>
+              <td class="left aligned four wide">Job ID</td>
+              <td class="left aligned">{{ res_data['id'] }}</td>
+            </tr>
+            <tr>
+              <td class="left aligned four wide">Backuped data size</td>
+              <td class="left aligned">{{ res_data['size'] }}</td>
+            </tr>
+            <tr>
+              <td class="left aligned four wide">Backuped files count</td>
+              <td class="left aligned">{{ res_data['files'] }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="row">
+        <h3>
+          Filelist from this backup
+        </h3>
+              <table class="ui left aligned celled table sortable">
+                <thead>
+                  <tr>
+                    <th>Filename</th>
+                    <th>Owner (uid:gid)</th>
+                    <th>Size in MBytes</th>
+                    <th>Last modified time</th>
+                  </tr>
+                </thead>
+                <tbody>
+            {% for job in res_data['files_list'] %}
+                  <tr>
+                    <td class="left aligned">{{ job['fname'] }}</td>
+                    <td class="left aligned">{{ job['uid'] }}:{{ job['gid'] }}</td>
+                    <td class="right aligned">{{ job['size'] }}</td>
+                    <td class="left aligned">{{ job['mtime'] }}</td>
+                  </tr>
+            {% endfor %}
+                </tbody>
+              </table>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+{%- include 'footer.html' %}

@@ -1,0 +1,39 @@
+{%- include 'header.html' %}
+
+<h2>
+  List of backups which runs more than 30 minutes
+</h2>
+<table class="ui fixed single line celled table">
+  <thead>
+    <tr>
+      <th>Client name</th>
+      <th>Job name</th>
+      <th>Job ID</th>
+      <th>Job status</th>
+      <th>Job scheduled time</th>
+      <th>start time</th>
+      <th>end time</th>
+      <th>Job duration</th>
+      <th>Job files count</th>
+      <th>Backup size</th>
+    </tr>
+  </thead>
+{% for job in long_job %}
+  <tbody>
+    <tr>
+      <td>{{ job['cname'] }}</td>
+      <td><a href="/reports/client/{{ job['jname'] }}/{{ job['jsched'] }}">{{ job['jname'] }}</a></td>
+      <td>{{ job['jid'] }}</td>
+      <td>{{ job['jstatus'] }}</td>
+      <td>{{ job['jsched'] }}</td>
+      <td>{{ job['jstart'] }}</td>
+      <td>{{ job['jend'] }}</td>
+      <td>{{ job['jduration'] }}</td>
+      <td>{{ job['jfiles'] }}</td>
+      <td>{{ job['jbytes'] }}</td>
+    </tr>
+  </tbody>
+{% endfor %}
+</table>
+
+{%- include 'footer.html' %}
