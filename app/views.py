@@ -75,6 +75,10 @@ def jobs_report():
     jfiles = res[6]
     jbytes = res[7]
     jlevel = res[8]
+    if jsched > datetime.now() - timedelta(hours=24):
+      old_job = False
+    else:
+      old_job = True
     result.append({
         'cname': cname,
         'jname': jname,
@@ -87,6 +91,7 @@ def jobs_report():
         'jfiles': int(jfiles),
         'jbytes': sizeof_fmt(int(jbytes)),
         'jlevel': static_vars.JobLevel[jlevel],
+        'old_job': old_job,
       })
   return render_template('jobs_report.html', title='Jobs report', jobs = result)
 

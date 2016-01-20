@@ -23,7 +23,7 @@
           </thead>
           <tbody>
     {%- for job in jobs %}
-            <tr>
+            <tr{% if job['old_job'] %}  class="negative"{% endif %}>
               <td class="right aligned">{{ job['cname'] }}</td>
               <td class="right aligned">{{ job['jname'] }}</td>
               <td>{% autoescape false %}{{ job['jlevel'] }}{% endautoescape %}</td>
