@@ -19,9 +19,19 @@ def favicon():
 @app.route('/')
 @app.route('/home')
 def index():
-  s1 = select([client.c.name, job.c.name, job.c.jobstatus, job.c.schedtime, job.c.jobfiles, job.c.jobbytes],  use_labels=True).where(and_(client.c.clientid == job.c.clientid, jobhist.c.schedtime > date.today() - timedelta(days=56)))
-  s2 = select([client.c.name, jobhist.c.name.label('job_name'), jobhist.c.jobstatus, jobhist.c.schedtime, jobhist.c.jobfiles, jobhist.c.jobbytes],  use_labels=True).where(and_(client.c.clientid == jobhist.c.clientid, jobhist.c.schedtime > date.today() - timedelta(days=56)))
-  query = s1.union(s2).alias('job_name')
+  #s1 = select([client.c.name, job.c.name, job.c.jobstatus, job.c.schedtime, job.c.jobfiles, job.c.jobbytes],  use_labels=True).where(and_(client.c.clientid == job.c.clientid, jobhist.c.schedtime > date.today() - timedelta(days=56)))
+  #s2 = select([client.c.name, jobhist.c.name.label('job_name'), jobhist.c.jobstatus, jobhist.c.schedtime, jobhist.c.jobfiles, jobhist.c.jobbytes],  use_labels=True).where(and_(client.c.clientid == jobhist.c.clientid, jobhist.c.schedtime > date.today() - timedelta(days=56)))
+  #query = s1.union(s2).alias('job_name')
+  query = """
+  SELECT client.name AS client_name, job.name AS job_name, job.jobstatus AS job_jobstatus, job.schedtime AS job_schedtime, job.jobfiles AS job_jobfiles, job.jobbytes AS job_jobbytes
+  FROM client, job
+  WHERE client.clientid = job.clientid AND job.schedtime > now() - interval '28 days'
+  UNION
+  SELECT client.name AS client_name, jobhisto.name AS job_name, jobhisto.jobstatus AS jobhisto_jobstatus, jobhisto.schedtime AS
+  jobhisto_schedtime, jobhisto.jobfiles AS jobhisto_jobfiles, jobhisto.jobbytes AS jobhisto_jobbytes
+  FROM client, jobhisto
+  WHERE client.clientid = jobhisto.clientid AND jobhisto.schedtime > now() - interval '28 days';
+  """
   result = db.execute(query).fetchall()
   b_s_res = []
   b_c_res = []
