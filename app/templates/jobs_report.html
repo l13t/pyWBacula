@@ -17,6 +17,7 @@
               <th>Files count in backup</th>
               <th>Backup size</th>
               <th>Job status</th>
+              <th></th>
             </tr>
           </thead>
           <tbody>
@@ -32,6 +33,7 @@
               <td class="right aligned">{{ job['jfiles'] }}</td>
               <td class="right aligned">{{ job['jbytes'] }}</td>
               <td class="right aligned">{% autoescape false %}{{ job['jstatus'] }}{% endautoescape %}</td>
+              <td><a href="/reports/client/{{ job['jname'] }}/{{ job['jsched'] }}" class="ui button">Details</a></td>
             </tr>
     {%- endfor %}
           </tbody>
