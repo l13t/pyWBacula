@@ -1,17 +1,5 @@
 {%- include 'header.html' %}
 
-    <div class="ui large center aligned menu">
-      <a class="item">test</a>
-      <a class="item">test</a>
-      <a class="item">test</a>
-      <a class="item">test</a>
-      <div class="right menu">
-        <div class="right item">
-          <a class="ui button">Submit</a>
-        </div>
-      </div>
-    </div>
-
 <div class="ui vertical stripe segment">
   <div class="ui middle aligned stackable grid container">
     <div class="row">
@@ -19,19 +7,31 @@
         <table class="ui left aligned celled table">
           <thead>
             <tr>
-              <th>JobID</th>
-              <th>Job Name</th>
               <th>Client Name</th>
-              <th>Job Size</th>
+              <th>Job Name</th>
+              <th>Job start time</th>
+              <th>Job end time</th>
+              <th>Job scheduled time</th>
+              <th>Job duration</th>
+              <th>Job start duration</th>
+              <th>Files count in backup</th>
+              <th>Backup size</th>
+              <th>Job status</th>
             </tr>
           </thead>
           <tbody>
     {%- for job in jobs %}
             <tr>
-              <td class="right aligned">{{ job['Job_JobId'] }}</td>
-              <td class="left aligned">{{ job['Job_Name'] }}</td>
-              <td class="left aligned">{{ job['Client_Name'] }}</td>
-              <td class="left aligned">{{ job['Job_JobBytes'] }}</td>
+              <td class="right aligned">{{ job['cname'] }}</td>
+              <td class="right aligned">{{ job['jname'] }}</td>
+              <td class="right aligned">{{ job['jstart'] }}</td>
+              <td class="right aligned">{{ job['jend'] }}</td>
+              <td class="right aligned">{{ job['jsched'] }}</td>
+              <td class="right aligned">{{ job['jdur'] }}</td>
+              <td class="right aligned">{{ job['jstdur'] }}</td>
+              <td class="right aligned">{{ job['jfiles'] }}</td>
+              <td class="right aligned">{{ job['jbytes'] }}</td>
+              <td class="right aligned">{% autoescape false %}{{ job['jstatus'] }}{% endautoescape %}</td>
             </tr>
     {%- endfor %}
           </tbody>

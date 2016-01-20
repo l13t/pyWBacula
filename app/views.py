@@ -60,11 +60,32 @@ def reports():
 
 @app.route('/reports/jobs', methods=['POST'])
 def jobs_report():
-  s = select([job,client], use_labels=True).where(job.c.clientid == client.c.clientid).where(or_(client.c.name.like('jotun%'), client.c.name.like('%heimr%'))).order_by(job.c.jobid.desc())
-  #s = select([(client.c.name)]).where(client.c.name.like('jotun%'))
-  
-  result = db.execute(s).fetchall()
-
+  s = "SELECT client.name AS client_name, job.name AS job_name, job.jobstatus AS job_jobstatus, job.starttime AS job_startime, job.endtime AS job_endtime, job.schedtime AS job_schedtime, job.jobfiles AS job_jobfiles, job.jobbytes AS job_jobbytes FROM client, job, (select max(job.schedtime) as max_schedtime, job.name AS job_name from job group by job.name) as lj where lj.job_name = job.name and job.schedtime = lj.max_schedtime and client.clientid = job.clientid"
+  query_result = db.execute(s).fetchall()
+  result = []
+  for i, res in enumerate(query_result):
+    cname = res[0]
+    jname = res[1]
+    jstatus = res[2]
+    jstart = res[3]
+    jend = res[4]
+    jsched = res[5]
+    jdur = jend - jstart
+    jstdur = jstart - jsched
+    jfiles = res[6]
+    jbytes = res[7]
+    result.append({
+        'cname': cname,
+        'jname': jname,
+        'jstatus': static_vars.JobStatus[jstatus],
+        'jstart': jstart.strftime('%Y-%m-%d %H:%M:%S'),
+        'jend': jend.strftime('%Y-%m-%d %H:%M:%S'),
+        'jsched': jsched,
+        'jdur': jdur,
+        'jstdur': jstdur,
+        'jfiles': int(jfiles),
+        'jbytes': sizeof_fmt(int(jbytes)),
+      })
   return render_template('jobs_report.html', title='Jobs report', jobs = result)
 
 @app.route('/reports/big_files', methods=['POST'])
