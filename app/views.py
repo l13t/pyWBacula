@@ -60,7 +60,7 @@ def reports():
 
 @app.route('/reports/jobs', methods=['POST'])
 def jobs_report():
-  s = "SELECT client.name AS client_name, job.name AS job_name, job.jobstatus AS job_jobstatus, job.starttime AS job_startime, job.endtime AS job_endtime, job.schedtime AS job_schedtime, job.jobfiles AS job_jobfiles, job.jobbytes AS job_jobbytes FROM client, job, (select max(job.schedtime) as max_schedtime, job.name AS job_name from job group by job.name) as lj where lj.job_name = job.name and job.schedtime = lj.max_schedtime and client.clientid = job.clientid"
+  s = "SELECT client.name AS client_name, job.name AS job_name, job.jobstatus AS job_jobstatus, job.starttime AS job_startime, job.endtime AS job_endtime, job.schedtime AS job_schedtime, job.jobfiles AS job_jobfiles, job.jobbytes AS job_jobbytes, job.level as job_level FROM client, job, (select max(job.schedtime) as max_schedtime, job.name AS job_name from job group by job.name) as lj where lj.job_name = job.name and job.schedtime = lj.max_schedtime and client.clientid = job.clientid"
   query_result = db.execute(s).fetchall()
   result = []
   for i, res in enumerate(query_result):
@@ -74,6 +74,7 @@ def jobs_report():
     jstdur = jstart - jsched
     jfiles = res[6]
     jbytes = res[7]
+    jlevel = res[8]
     result.append({
         'cname': cname,
         'jname': jname,
@@ -85,6 +86,7 @@ def jobs_report():
         'jstdur': jstdur,
         'jfiles': int(jfiles),
         'jbytes': sizeof_fmt(int(jbytes)),
+        'jlevel': static_vars.JobLevel[jlevel],
       })
   return render_template('jobs_report.html', title='Jobs report', jobs = result)
 

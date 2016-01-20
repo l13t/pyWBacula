@@ -9,6 +9,7 @@
             <tr>
               <th>Client Name</th>
               <th>Job Name</th>
+              <th>Job Level</th>
               <th>Job start time</th>
               <th>Job end time</th>
               <th>Job scheduled time</th>
@@ -25,6 +26,7 @@
             <tr>
               <td class="right aligned">{{ job['cname'] }}</td>
               <td class="right aligned">{{ job['jname'] }}</td>
+              <td>{% autoescape false %}{{ job['jlevel'] }}{% endautoescape %}</td>
               <td class="right aligned">{{ job['jstart'] }}</td>
               <td class="right aligned">{{ job['jend'] }}</td>
               <td class="right aligned">{{ job['jsched'] }}</td>
