@@ -30,7 +30,11 @@
           <td>{{ backup['date'] }}</td>
           <td>{{ backup['files'] }}</td>
           <td>{{ backup['size'] }}</td>
-          <td width=8%>{{ backup['status'] }}</td>
+          <td width=8%>
+            {% autoescape false %}
+            {{ backup['status'] }}
+            {% endautoescape %}
+          </td>
           <td><a href="/reports/client/{{ backup['bak_name'] }}/{{ backup['date'] }}" class="ui button">Details</a></td>
         </tr>
     {% endfor %}
