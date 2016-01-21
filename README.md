@@ -1,4 +1,4 @@
-# pyWBacula
+# pyWBacula v0.1
 Another one simple bacula web reports interface.
 
 I wasn't satisfied with current web interfaces for bacula. Cause they show default information which I can get from console and doesn't show really useful information (like big files in backup, long-running-backups etc).
