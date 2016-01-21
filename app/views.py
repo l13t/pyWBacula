@@ -10,6 +10,7 @@ from time import gmtime, strftime
 from database import *
 from lib import *
 import static_vars
+import re
 #### End of import section ####
 
 @app.route('/favicon.ico')
@@ -19,6 +20,8 @@ def favicon():
 @app.route('/')
 @app.route('/home')
 def index():
+  if re.match("Wget", request.headers.get('User-Agent')):
+    return render_template("ok_mon_server.html", title="Home page")
   #s1 = select([client.c.name, job.c.name, job.c.jobstatus, job.c.schedtime, job.c.jobfiles, job.c.jobbytes],  use_labels=True).where(and_(client.c.clientid == job.c.clientid, jobhist.c.schedtime > date.today() - timedelta(days=56)))
   #s2 = select([client.c.name, jobhist.c.name.label('job_name'), jobhist.c.jobstatus, jobhist.c.schedtime, jobhist.c.jobfiles, jobhist.c.jobbytes],  use_labels=True).where(and_(client.c.clientid == jobhist.c.clientid, jobhist.c.schedtime > date.today() - timedelta(days=56)))
   #query = s1.union(s2).alias('job_name')

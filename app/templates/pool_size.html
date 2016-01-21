@@ -1,6 +1,6 @@
 {%- include 'header.html' %}
-
+<div class="ui vertical footer segment">
 {% line_chart p_size with library={ "xAxis":{"title":{"text":"Date period"}}, "yAxis":{"title":{"text":"Pool size in Bytes"}}, "title": {"text": "Bacula pools size history"} } %}
 {% line_chart s_size with library={ "xAxis":{"title":{"text":"Date period"}}, "yAxis":{"title":{"text":"Pool size in Bytes"}}, "title": {"text": "Bacula pools size history"} } %}
-
+</div>
 {%- include 'footer.html' %}
