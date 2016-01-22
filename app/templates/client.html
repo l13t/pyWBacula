@@ -38,8 +38,20 @@ $( document ).ready(function() {
               <td class="left aligned">{{ res_data['jname'] }}</td>
             </tr>
             <tr>
+              <td class="left aligned four wide">Job Level</td>
+              <td class="left aligned">
+                {% autoescape false %}
+                {{ res_data['jlevel'] }}
+                {% endautoescape %}
+              </td>
+            </tr>
+            <tr>
               <td class="left aligned four wide">Job Run Status</td>
-              <td class="left aligned">{{ res_data['jstatus'] }}</td>
+              <td class="left aligned">
+                {% autoescape false %}
+                {{ res_data['jstatus'] }}
+                {% endautoescape %}
+              </td>
             </tr>
             <tr>
               <td class="left aligned four wide">Job ID</td>

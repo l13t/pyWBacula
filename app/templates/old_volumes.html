@@ -1,0 +1,82 @@
+{%- include 'header.html' %}
+
+<script src="/static/dist/components/tab.js"></script>
+<script src="/static/sinon.js"></script>
+<script type="text/javascript">// <![CDATA[
+$( document ).ready(function() {
+
+        // initialize both popups inline
+        $('.demo.menu .item').tab({ history: false });
+
+            });
+// ]]></script>
+
+<div class="ui vertical footer segment">
+  <h2>Volume usage report</h2>
+  <div class="row">
+    <div class="ui pointing secondary demo menu">
+      {% set flag = True %}
+      {% set flag_time = [] %}
+      {% for vol, vol_data in vol_list.items() %}
+      <a class="item{% if flag %}{% do flag_time.append(vol) %} active{% set flag = False %}{% endif %}" data-tab="{{ vol}}">{{ vol }}</a>
+      {% endfor %}
+    </div>
+      {% for vol, vol_data in vol_list.items() %}
+    <div class="ui{% if vol in flag_time %} active{% endif %} tab segment" data-tab="{{ vol }}">
+      <h2>
+      </h2>
+      <table class="ui very basic collapsing celled table">
+        <tbody>
+          <tr>
+            <td>Pool name</td>
+            <td>{{ vol }}</td>
+          </tr>
+          <tr>
+            <td>Pool type</td>
+            <td>{{ vol_data['pptype'] }}</td>
+          </tr>
+          <tr>
+            <td>Pool retention</td>
+            <td>{{ vol_data['pvolret'] }}</td>
+          </tr>
+          <tr>
+            <td>Pool maximum volume count</td>
+            <td>{{ vol_data['pmvol'] }}</td>
+          </tr>
+          <tr>
+            <td>Pool volume count</td>
+            <td>{{ vol_data['pnumvol'] }}</td>
+          </tr>
+          <tr>
+            <td>Pool ID (in database)</td>
+            <td>{{ vol_data['ppid'] }}</td>
+          </tr>
+        </tbody>
+      </table>
+      <table class="ui celled striped table">
+        <thead>
+          <tr>
+            <th>Volume name</th>
+            <th>Volume type</th>
+            <th>Volume status</th>
+            <th>Volume last write time</th>
+            <th>Volume retention</th>
+          </tr>
+        </thead>
+        <tbody>
+        {% for media, media_data in vol_data['vols'].items() %}
+          <tr>
+            <td>{{ media }}</td>
+            <td>{{ media_data['mtype'] }}</td>
+            <td>{% autoescape false %}{{ media_data['mvolst'] }}{% endautoescape %}</td>
+            <td>{{ media_data['mlastwr'] }}</td>
+            <td>{{ media_data['mvolret'] }}</td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+      {% endfor %}
+  </div>
+</div>
+{%- include 'footer.html' %}

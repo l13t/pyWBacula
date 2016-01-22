@@ -53,3 +53,18 @@ JobLevel= {
   ' ' : '<div class="ui black label">Restore/Admin</div>',
   'f' : '<div class="ui teal label">Virtual full</div>', 
 }
+
+VOLUME_STATUS_SEVERITY = {
+  "Append": '<div class="ui yellow label">Append</div>',
+  "Archive": '<div class="ui purple label">Archive</div>',
+  "Disabled": '<div class="ui black label">Disabled</div>',
+  "Full": '<div class="ui blue label">Full</div>',
+  "Used": '<div class="ui blue label">Used</div>',
+  "Cleaning": '<div class="ui purple  label">Cleaning</div>',
+  "Purged": '<div class="ui green label">Purged</div>',
+  "Recycle": '<div class="ui green label">Recycle</div>',
+  "Read-Only": '<div class="ui red label">Read-Only</div>',
+  "Error": '<div class="ui red label">Error</div>',
+}
+
+

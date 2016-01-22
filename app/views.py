@@ -144,7 +144,7 @@ def pool_size_report():
 
 @app.route('/reports/client/<host_name>/<bdate>')
 def client_detailed_info(host_name, bdate):
-  s = select([client.c.name, job.c.name, job.c.jobstatus, job.c.schedtime, job.c.jobfiles, job.c.jobbytes, job.c.jobid],  use_labels=True).where(and_(client.c.clientid == job.c.clientid, cast(job.c.schedtime,Date) == bdate, job.c.name == host_name, job.c.schedtime == bdate))
+  s = select([client.c.name, job.c.name, job.c.jobstatus, job.c.schedtime, job.c.jobfiles, job.c.jobbytes, job.c.jobid, job.c.level],  use_labels=True).where(and_(client.c.clientid == job.c.clientid, cast(job.c.schedtime,Date) == bdate, job.c.name == host_name, job.c.schedtime == bdate))
   _short_res = db.execute(s).fetchall()
   short_res = []
   for i, _short in enumerate(_short_res):
@@ -155,6 +155,7 @@ def client_detailed_info(host_name, bdate):
     j_files = _short[4]
     j_bytes = _short[5]
     j_id = _short[6]
+    j_level = _short[7]
     f_sel = select([path.c.path, filename.c.name, files.c.lstat]).where(
         and_(
             job.c.name == host_name,
@@ -177,6 +178,7 @@ def client_detailed_info(host_name, bdate):
       'files': int(j_files),
       'size': sizeof_fmt(int(j_bytes)),
       'files_list': backup_files_list,
+      'jlevel': static_vars.JobLevel[j_level],
     })
   s1 = select([client.c.name, job.c.name, job.c.schedtime, job.c.jobfiles, job.c.jobbytes],  use_labels=True).where(and_(client.c.clientid == job.c.clientid, jobhist.c.schedtime > date.today() - timedelta(days=14), job.c.name == host_name))
   s2 = select([client.c.name, jobhist.c.name.label('job_name'), jobhist.c.schedtime, jobhist.c.jobfiles, jobhist.c.jobbytes],  use_labels=True).where(and_(client.c.clientid == jobhist.c.clientid, jobhist.c.schedtime > date.today() - timedelta(days=14), jobhist.c.name == host_name))
@@ -238,3 +240,40 @@ def long_running_backups():
       'jid': int(jid),
     })
   return render_template('long_running_backups.html', title="Backups which run more than 30 minutes", long_job=long_job)
+
+@app.route('/reports/old_volumes')
+def old_volumes():
+  vol_list = {}
+  s = """
+  select
+    p.name,
+    p.poolid,
+    p.volretention,
+    p.pooltype,
+    p.maxvols,
+    p.numvols
+  from
+    pool as p
+  """
+  pools = db.execute(s).fetchall()
+  for i, pool in enumerate(pools):
+    _pool = { str(pool[0]) : { 'ppid': int(pool[1]), 'pvolret': int(pool[2]), 'pptype': str(pool[3]), 'pmvol': int(pool[4]), 'pnumvol': int(pool[5]), 'vols': {} } }
+    st = """
+    select 
+      m.volumename,
+      m.mediatype,
+      m.volstatus,
+      m.lastwritten,
+      m.volretention
+    from
+      media as m
+    where
+      m.poolid = """ + str(_pool[pool[0]]['ppid'])
+    medias = db.execute(st).fetchall()
+    _media = {}
+    for j, media in enumerate(medias):
+      _media.update({ str(media[0]) : { 'mtype': str(media[1]), 'mvolst': static_vars.VOLUME_STATUS_SEVERITY[str(media[2])], 'mlastwr': media[3].strftime('%Y-%m-%d %H:%M:%S'), 'mvolret': int(media[4]) } })
+    _pool[pool[0]]['vols'] = _media
+    vol_list.update(_pool)
+  return render_template('old_volumes.html', title="Not recycled volumes report", vol_list=vol_list)
+
