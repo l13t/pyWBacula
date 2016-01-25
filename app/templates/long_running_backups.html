@@ -24,7 +24,7 @@
       <td>{{ job['cname'] }}</td>
       <td><a href="/reports/client/{{ job['jname'] }}/{{ job['jsched'] }}">{{ job['jname'] }}</a></td>
       <td>{{ job['jid'] }}</td>
-      <td>{{ job['jstatus'] }}</td>
+      <td>{% autoescape false %}{{ job['jstatus'] }}{% endautoescape %}</td>
       <td>{{ job['jsched'] }}</td>
       <td>{{ job['jstart'] }}</td>
       <td>{{ job['jend'] }}</td>
