@@ -1,6 +1,28 @@
 {%- include 'header.html' %}
 
+<script src="/static/dist/components/form.js"></script>
+
 <div class="ui vertical stripe segment">
+  <form class="ui form segment">
+    <div class="one fields">
+      <div class="field">
+        <label>Maximum file size (specified in KiB)</label>
+        <div class="ui selection dropdown" tabindex="0">
+          <input name="_max_size" type="hidden">
+          <i class="dropdown icon">
+          </i>
+          <div class="menu transition hidden" tabindex="-1">
+            <div class="item active" data-value="10">10 MiB</div>
+            <div class="item" data-value="100">100 MiB</div>
+            <div class="item" data-value="1024">1 GiB</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="ui blue submit button">
+      Use this files size
+    </div>
+  </form>
   {% for job_name, job_data in bf_report.items() %}
     {% if job_data != [] %}
   <div class="ui middle aligned stackable grid container">

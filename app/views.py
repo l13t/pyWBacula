@@ -98,8 +98,11 @@ def jobs_report():
       })
   return render_template('jobs_report.html', title='Jobs report', jobs = result)
 
-@app.route('/reports/big_files', methods=['POST'])
+@app.route('/reports/big_files', methods=['GET', 'POST'])
 def big_files_report():
+  _max_size = 10
+  if request.method == 'POST':
+    _max_size = int(request.form['_max_size'])
   s = select([job.c.name]).where(job.c.starttime > datetime.now() - timedelta(hours=24))
   result = db.execute(s).fetchall()
   proceed_result = {}
@@ -120,27 +123,30 @@ def big_files_report():
 
 @app.route('/reports/pool_size_report', methods=['POST'])
 def pool_size_report():
-  s = select([pool.c.name, job.c.schedtime, func.sum(job.c.jobbytes).label("pool_size")], use_labels=True).where(
-      and_(
-          job.c.schedtime > (date.today() - timedelta(days=28)),
-          job.c.poolid == pool.c.poolid
-          )
-      ).group_by(pool.c.name, job.c.schedtime)
-  result = db.execute(s).fetchall()
-  p_s_result = gen_chart_array_time_3d(result)
-  s = select(
-    [storage.c.name, jobhist.c.schedtime, func.sum(jobhist.c.jobbytes).label("storage_size")]
-  ).where(
-    and_(
-      jobhist.c.jobid == jobmedia.c.jobid,
-      storage.c.storageid == media.c.storageid,
-      jobmedia.c.mediaid == media.c.mediaid,
-      jobhist.c.schedtime > (date.today() - timedelta(days=28)),
-    )
-  ).group_by(storage.c.name, jobhist.c.schedtime)
+  s = """
+  select
+  pool.name as pool_name, job.schedtime as job_schedtime, sum(job.jobbytes) as pool_size
+  from
+  pool, job
+  where
+  job.schedtime > now() - interval '28 days' and job.poolid = pool.poolid
+  group by
+  pool.name, job.schedtime
+  union
+  select
+  pool.name as pool_name, jobhisto.schedtime as job_schedtime, sum(jobhisto.jobbytes) as pool_size
+  from
+  pool, jobhisto
+  where
+  jobhisto.schedtime > now() - interval '28 days' and jobhisto.poolid = pool.poolid
+  group by
+  pool.name, jobhisto.schedtime
+  order by
+  job_schedtime, pool_name
+  """
   result = db.execute(s).fetchall()
   s_s_result = gen_chart_array_time_3d(result)
-  return render_template("pool_size.html", title='Pool size report', p_size=p_s_result, s_size = s_s_result, res=result)
+  return render_template("pool_size.html", title='Pool size report', s_size = s_s_result)
 
 @app.route('/reports/client/<host_name>/<bdate>')
 def client_detailed_info(host_name, bdate):
