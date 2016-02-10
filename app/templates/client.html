@@ -7,6 +7,13 @@ $( document ).ready(function() {
 
     // initialize both popups inline
     $('.demo.menu .item').tab({ history: false });
+    $('table').tablesort().data('tablesort');
+    $('thead th.number').data('sortBy', function(th, td, tablesort) {
+        return new parseFloat(td.data-sort-value());
+    });
+    $('thead th.date').data('sortBy', function(th, td, tablesort) {
+      return new Date(td.text());
+    });
 
     });
 // ]]></script>
@@ -72,21 +79,21 @@ $( document ).ready(function() {
         <h3>
           Filelist from this backup
         </h3>
-              <table class="ui left aligned celled table sortable">
+              <table class="ui fixed left aligned celled table sortable">
                 <thead>
                   <tr>
-                    <th>Filename</th>
-                    <th>Owner (uid:gid)</th>
-                    <th>Size in MBytes</th>
-                    <th>Last modified time</th>
+                    <th width="60%">Filename</th>
+                    <th class="no-sort">Owner (uid:gid)</th>
+                    <th class="number">Size in MBytes</th>
+                    <th class="date">Last modified time</th>
                   </tr>
                 </thead>
                 <tbody>
             {% for job in res_data['files_list'] %}
                   <tr>
-                    <td class="left aligned">{{ job['fname'] }}</td>
+                    <td width="60%" class="left aligned">{{ job['fname'] }}</td>
                     <td class="left aligned">{{ job['uid'] }}:{{ job['gid'] }}</td>
-                    <td class="right aligned">{{ job['size'] }}</td>
+                    <td data-sort-value={{ job['real_size'] }}>{{ job['size'] }}</td>
                     <td class="left aligned">{{ job['mtime'] }}</td>
                   </tr>
             {% endfor %}

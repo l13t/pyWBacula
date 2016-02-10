@@ -34,7 +34,7 @@ def decode_file_info(record):
   atime = gmtime(base64_decode_lstat(record[2], 10))
   mtime = gmtime(base64_decode_lstat(record[2], 11))
   ctime = gmtime(base64_decode_lstat(record[2], 12))
-  return_array = {'fname': file_name, 'uid': base64_decode_lstat(record[2], 6), 'gid':base64_decode_lstat(record[2], 5), 'size': sizeof_fmt(base64_decode_lstat(record[2], 7)), 'mtime':strftime("%b %d %Y %H:%M", mtime), 'atime': strftime("%b %d %Y %H:%M", atime), 'ctime': strftime("%b %d %Y %H:%M", ctime)}
+  return_array = {'fname': file_name, 'uid': base64_decode_lstat(record[2], 6), 'gid':base64_decode_lstat(record[2], 5), 'size': sizeof_fmt(base64_decode_lstat(record[2], 7)), 'mtime':strftime("%b %d %Y %H:%M", mtime), 'atime': strftime("%b %d %Y %H:%M", atime), 'ctime': strftime("%b %d %Y %H:%M", ctime), 'real_size': base64_decode_lstat(record[2], 7)}
   return return_array
 
 def show_decoded_big_files_results(result, f_size):
