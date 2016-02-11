@@ -6,7 +6,7 @@ from sqlalchemy import desc, asc, cast, Date
 from sqlalchemy.sql import and_, or_, not_, select, func
 import os
 from datetime import time, datetime, date, timedelta
-from time import gmtime, strftime, mktime
+from time import gmtime, strftime, strptime, mktime
 from database import *
 from lib import *
 import static_vars
@@ -288,11 +288,15 @@ def old_volumes():
     vol_list.update(_pool)
   return render_template('old_volumes.html', title="Not recycled volumes report", vol_list=vol_list)
 
-@app.route('/reports/backup_duration/<bddate>', methods=['POST'])
+@app.route('/reports/backup_duration/<bddate>', methods=['GET', 'POST'])
 def backup_duration(bddate):
-  s = select([pool.c.name, func.min(job.c.starttime), func.max(job.c.endtime)],  use_labels=True).where(and_(job.c.poolid == pool.c.poolid, cast(job.c.schedtime,Date) <= datetime.fromtimestamp(float(bddate)), cast(job.c.schedtime,Date) >= datetime.fromtimestamp(float(bddate)) - timedelta(days=1))).group_by(pool.c.name)
+  s = select([pool.c.name, func.min(job.c.starttime), func.max(job.c.endtime)],  use_labels=True).where(and_(job.c.poolid == pool.c.poolid, cast(job.c.schedtime,Date) <= datetime.fromtimestamp(float(bddate)), cast(job.c.schedtime,Date) >= datetime.fromtimestamp(float(bddate)) - timedelta(days=1))).group_by(pool.c.name, job.c.schedtime)
   bd = db.execute(s).fetchall()
   bd_result = {}
   for bpool in bd:
     bd_result.update({ bpool[0]: { 'start': bpool[1], 'end': bpool[2] } })
-  return render_template('backup_duration.html', title="Backup duration time", bd_result=bd_result)
+  s = select([func.min(job.c.starttime), func.max(job.c.endtime)],  use_labels=True).where(job.c.poolid == pool.c.poolid)
+  _min_date, _max_date = db.execute(s).fetchone()
+  min_date = int(mktime((strptime(str(_min_date), "%Y-%m-%d %H:%M:%S"))))
+  max_date = int(mktime((strptime(str(_max_date), "%Y-%m-%d %H:%M:%S"))))
+  return render_template('backup_duration.html', title="Backup duration time", bd_result=bd_result, bddate=int(bddate), min_date=min_date, max_date=max_date)
