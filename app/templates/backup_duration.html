@@ -1,0 +1,32 @@
+{%- include 'header.html' %}
+
+<div class="ui vertical stripe segment">
+  <div class="ui middle aligned stackable grid container">
+    <div class="row">
+      <div class="column">
+        <table class="ui left aligned celled table">
+          <thead>
+            <tr>
+              <th>Pool name</th>
+              <th>Start time</th>
+              <th>Stop time</th>
+              <th>Duration time</th>
+            </tr>
+          </thead>
+          <tbody>
+  {% for pool, time_data in bd_result.items() %}
+            <tr>
+              <td class="left aligned">{{ pool }}</td>
+              <td class="right aligned">{{ time_data['start'] }}</td>
+              <td class="right aligned">{{ time_data['end'] }}</td>
+              <td class="right aligned">{{ time_data['end'] - time_data['start'] }}</td>
+            </tr>
+  {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+{%- include 'footer.html' %}

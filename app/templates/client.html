@@ -2,17 +2,23 @@
 <div class="ui vertical footer segment">
 <script src="/static/dist/components/tab.js"></script>
 <script src="/static/sinon.js"></script>
+<script src="/static/jquery.tablesort.js"></script>
 <script type="text/javascript">// <![CDATA[
 $( document ).ready(function() {
 
     // initialize both popups inline
     $('.demo.menu .item').tab({ history: false });
+
+    $('table').tablesort(); // Make the table sortable.
+    var tablesort = $('table').data('tablesort'); // Get a reference to it's tablesort instance
+
     $('table').tablesort().data('tablesort');
     $('thead th.number').data('sortBy', function(th, td, tablesort) {
-        return new parseFloat(td.data-sort-value());
+        return parseInt(td.getAttribute('data-sort', 2), 10);
     });
+
     $('thead th.date').data('sortBy', function(th, td, tablesort) {
-      return new Date(td.text());
+          return new Date(td.text());
     });
 
     });
@@ -84,7 +90,7 @@ $( document ).ready(function() {
                   <tr>
                     <th width="60%">Filename</th>
                     <th class="no-sort">Owner (uid:gid)</th>
-                    <th class="number">Size in MBytes</th>
+                    <th data-sort="int" class="number">Size in MBytes</th>
                     <th class="date">Last modified time</th>
                   </tr>
                 </thead>
@@ -93,7 +99,7 @@ $( document ).ready(function() {
                   <tr>
                     <td width="60%" class="left aligned">{{ job['fname'] }}</td>
                     <td class="left aligned">{{ job['uid'] }}:{{ job['gid'] }}</td>
-                    <td data-sort-value={{ job['real_size'] }}>{{ job['size'] }}</td>
+                    <td value={{ job['real_size'] }}>{{ job['size'] }}</td>
                     <td class="left aligned">{{ job['mtime'] }}</td>
                   </tr>
             {% endfor %}
