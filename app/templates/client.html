@@ -40,7 +40,7 @@ $( document ).ready(function() {
       </div>
       {% for res_data in short_info %}
       <div class="ui{% if res_data['jschedtime'] in flag_time %} active{% endif %} tab segment" data-tab="{{ res_data['jschedtime'] }}">
-        <table class="ui definition celled right aligned table" width="200px">
+        <table class="ui fixed definition celled right aligned table" width="200px">
           <tbody>
           <tr>
               <td class="left aligned four wide">Client Name</td>
@@ -75,6 +75,26 @@ $( document ).ready(function() {
               <td class="left aligned">{{ res_data['size'] }}</td>
             </tr>
             <tr>
+              <td class="left aligned four wide">Scheduled time</td>
+              <td class="left aligned">{{ res_data['jschedtime'] }}</td>
+            </tr>
+            <tr>
+              <td class="left aligned four wide">Start time</td>
+              <td class="left aligned">{{ res_data['jstarttime'] }}</td>
+            </tr>
+            <tr>
+              <td class="left aligned four wide">End time</td>
+              <td class="left aligned">{{ res_data['jendtime'] }}</td>
+            </tr>
+            <tr>
+              <td class="left aligned four wide">Job duration</td>
+              <td class="left aligned">{{ res_data['jduration'] }}</td>
+            </tr>
+            <tr>
+              <td class="left aligned four wide">Start delay</td>
+              <td class="left aligned">{{ res_data['jdelay'] }}</td>
+            </tr>
+            <tr>
               <td class="left aligned four wide">Backuped files count</td>
               <td class="left aligned">{{ res_data['files'] }}</td>
             </tr>
@@ -91,7 +111,7 @@ $( document ).ready(function() {
                     <th width="60%">Filename</th>
                     <th class="no-sort">Owner (uid:gid)</th>
                     <th data-sort="int" class="number">Size in MBytes</th>
-                    <th class="date">Last modified time</th>
+                    <th class="date">Last modified</th>
                   </tr>
                 </thead>
                 <tbody>

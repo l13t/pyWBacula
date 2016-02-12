@@ -151,7 +151,7 @@ def pool_size_report():
 
 @app.route('/reports/client/<host_name>/<bdate>')
 def client_detailed_info(host_name, bdate):
-  s = select([client.c.name, job.c.name, job.c.jobstatus, job.c.schedtime, job.c.jobfiles, job.c.jobbytes, job.c.jobid, job.c.level],  use_labels=True).where(and_(client.c.clientid == job.c.clientid, cast(job.c.schedtime,Date) == bdate, job.c.name == host_name, job.c.schedtime == bdate))
+  s = select([client.c.name, job.c.name, job.c.jobstatus, job.c.schedtime, job.c.jobfiles, job.c.jobbytes, job.c.jobid, job.c.level, job.c.starttime, job.c.endtime],  use_labels=True).where(and_(client.c.clientid == job.c.clientid, cast(job.c.schedtime,Date) == bdate, job.c.name == host_name, job.c.schedtime == bdate))
   _short_res = db.execute(s).fetchall()
   short_res = []
   for i, _short in enumerate(_short_res):
@@ -163,6 +163,8 @@ def client_detailed_info(host_name, bdate):
     j_bytes = _short[5]
     j_id = _short[6]
     j_level = _short[7]
+    j_start = _short[8]
+    j_end = _short[9]
     f_sel = select([path.c.path, filename.c.name, files.c.lstat]).where(
         and_(
             job.c.name == host_name,
@@ -182,6 +184,10 @@ def client_detailed_info(host_name, bdate):
       'jname': j_name,
       'jstatus': static_vars.JobStatus[j_status],
       'jschedtime': j_schedtime.strftime('%Y-%m-%d %H:%M:%S'),
+      'jstarttime': j_start.strftime('%Y-%m-%d %H:%M:%S'),
+      'jendtime': j_end.strftime('%Y-%m-%d %H:%M:%S'),
+      'jduration': (j_end - j_start),
+      'jdelay': (j_start - j_schedtime),
       'files': int(j_files),
       'size': sizeof_fmt(int(j_bytes)),
       'files_list': backup_files_list,
