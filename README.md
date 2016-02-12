@@ -10,6 +10,9 @@ So as a result I start writing own web reports interface.
 * PostgreSQL database (I use postgres on all my servers with bacula)
 * python Flask
 
+#Documentation
+[Instalation notes](https://github.com/l13t/pyWBacula/wiki/Installation)
+
 #Notes
 * requirements.txt contains modules which I use in my web interface
 * css is based on SemanticUI (http://semantic-ui.com/)
