@@ -1,4 +1,5 @@
 {%- include 'header.html' %}
+{%- include 'tables.html' %}
 
 <script src="/static/dist/components/form.js"></script>
 
@@ -29,7 +30,7 @@
     <div class="row">
       <div class="column">
         <h2><a href="/reports/client/{{ job_name }}/{{ sched_time[job_name] }}">{{ job_name }}</a> has big files in last backup</h2>
-        <table class="ui fixed left aligned celled table">
+        <table class="ui fixed left aligned celled table sort" id="bigfiles-{{ job_name }}-{{ sched_time[job_name] }}">
           <thead>
             <tr>
               <th>Filename</th>
@@ -49,6 +50,9 @@
       {% endfor %}
           </tbody>
         </table>
+        <script>
+new Tablesort(document.getElementById('bigfiles-{{ job_name }}-{{ sched_time[job_name] }}'));
+        </script>
       </div>
     </div>
   </div>

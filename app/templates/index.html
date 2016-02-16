@@ -1,4 +1,5 @@
 {%- include 'header.html' %}
+{%- include 'tables.html' %}
 <div class="ui vertical footer segment">
 <div class="ui two column stackable grid">
   <div class="column">
@@ -12,14 +13,14 @@
     <h3 class="ui center aligned header">
       Backup for last 24 hours
     </h3>
-    <table class="ui fixed sortable striped left aligned table">
+    <table class="ui fixed sort striped left aligned table" id='cllisttoday'>
       <thead>
         <tr>
-          <th>Client name</br> (Job name)</th>
-          <th width=16%>Backup date</th>
-          <th width=14%>Files count</th>
-          <th width=14%>Backup</br> size</th>
-          <th width=16%>Status</th>
+          <th class="sort-header">Client name</br> (Job name)</th>
+          <th class="sort-header" width=16%>Backup date</th>
+          <th class="sort-header" width=14%>Files count</th>
+          <th class="sort-header" width=14%>Backup</br> size</th>
+          <th class="sort-header" width=16%>Status</th>
         </tr>
       </thead>
       <tbody>
@@ -38,6 +39,9 @@
     {% endfor %}
       </tbody>
     </table>
+    <script>
+    new Tablesort(document.getElementById('cllisttoday'));
+    </script>
   </div>
 </div>
 </div>

@@ -1,10 +1,11 @@
 {%- include 'header.html' %}
+{%- include 'tables.html' %}
 
 <div class="ui vertical stripe segment">
   <div class="ui middle aligned stackable grid container">
     <div class="row">
       <div class="column">
-        <table class="ui fixed left aligned celled table">
+        <table class="ui fixed left aligned celled table sort" id="jobsreport">
           <thead>
             <tr>
               <th>Client Name</th>
@@ -15,25 +16,26 @@
               <th width=90px>Files count</th>
               <th width=90px>Backup size</th>
               <th width=100px>Job status</th>
-              <th width=100px></th>
             </tr>
           </thead>
           <tbody>
     {%- for job in jobs %}
             <tr{% if job['old_job'] %}  class="negative"{% endif %}>
               <td class="right aligned">{{ job['cname'] }}</td>
-              <td class="right aligned">{{ job['jname'] }}</td>
+              <td class="right aligned"><a href="/reports/client/{{ job['jname'] }}/{{ job['jsched'] }}">{{ job['jname'] }}</a></td>
               <td>{% autoescape false %}{{ job['jlevel'] }}{% endautoescape %}</td>
               <td class="right aligned">{{ job['jstart'] }}</td>
               <td class="right aligned">{{ job['jend'] }}</td>
               <td class="right aligned">{{ job['jfiles'] }}</td>
               <td class="right aligned">{{ job['jbytes'] }}</td>
               <td class="right aligned">{% autoescape false %}{{ job['jstatus'] }}{% endautoescape %}</td>
-              <td><a href="/reports/client/{{ job['jname'] }}/{{ job['jsched'] }}" class="ui button">More</a></td>
             </tr>
     {%- endfor %}
           </tbody>
         </table>
+        <script>
+new Tablesort(document.getElementById('jobsreport'));
+        </script>
       </div>
     </div>
   </div>

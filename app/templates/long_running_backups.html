@@ -1,9 +1,11 @@
 {%- include 'header.html' %}
+{%- include 'tables.html' %}
+
 <div class="ui vertical footer segment">
 <h2>
   List of backups which runs more than 30 minutes
 </h2>
-<table class="ui fixed single line celled table">
+<table class="ui fixed single line celled table sort" id="longrun">
   <thead>
     <tr>
       <th>Client name</th>
@@ -35,5 +37,8 @@
   </tbody>
 {% endfor %}
 </table>
+<script>
+new Tablesort(document.getElementById('longrun'));
+</script>
 </div>
 {%- include 'footer.html' %}

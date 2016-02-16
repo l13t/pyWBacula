@@ -1,28 +1,8 @@
 {%- include 'header.html' %}
+{%- include 'tables.html' %}
 <div class="ui vertical footer segment">
 <script src="/static/dist/components/tab.js"></script>
 <script src="/static/sinon.js"></script>
-<script src="/static/jquery.tablesort.js"></script>
-<script type="text/javascript">// <![CDATA[
-$( document ).ready(function() {
-
-    // initialize both popups inline
-    $('.demo.menu .item').tab({ history: false });
-
-    $('table').tablesort(); // Make the table sortable.
-    var tablesort = $('table').data('tablesort'); // Get a reference to it's tablesort instance
-
-    $('table').tablesort().data('tablesort');
-    $('thead th.number').data('sortBy', function(th, td, tablesort) {
-        return parseInt(td.getAttribute('data-sort', 2), 10);
-    });
-
-    $('thead th.date').data('sortBy', function(th, td, tablesort) {
-          return new Date(td.text());
-    });
-
-    });
-// ]]></script>
 
 <div class="ui two column stackable grid">
   <div class="row">
@@ -105,7 +85,7 @@ $( document ).ready(function() {
         <h3>
           Filelist from this backup
         </h3>
-              <table class="ui fixed left aligned celled table sortable">
+              <table class="ui fixed left aligned celled table sort" id="clfiles">
                 <thead>
                   <tr>
                     <th width="60%">Filename</th>
@@ -125,6 +105,9 @@ $( document ).ready(function() {
             {% endfor %}
                 </tbody>
               </table>
+              <script>
+new Tablesort(document.getElementById('clfiles'));
+              </script>
       </div>
       {% endfor %}
     </div>
