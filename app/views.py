@@ -57,6 +57,10 @@ def page_not_found(e):
 def about_page():
   return render_template('about.html', title="About page")
 
+@app.route('/contact_us')
+def contacts_page():
+  return render_template('contacts.html', title="Contact us")
+
 @app.route('/reports')
 def reports():
   unix_today = int(mktime(gmtime()))
@@ -104,23 +108,25 @@ def big_files_report():
   _max_size = 10
   if request.method == 'POST':
     _max_size = int(request.form['_max_size'])
-  s = select([job.c.name]).where(job.c.starttime > datetime.now() - timedelta(hours=24))
+  s = select([job.c.name, job.c.schedtime]).where(job.c.schedtime > datetime.now() - timedelta(hours=24))
   result = db.execute(s).fetchall()
   proceed_result = {}
+  sched_time = {}
   for res in result:
     job_i = str(res[0])
     s = select([path.c.path, filename.c.name, files.c.lstat]).where(
         and_(
             job.c.name == job_i,
             job.c.jobid == files.c.jobid,
-            job.c.starttime > datetime.now() - timedelta(hours=24),
+            job.c.schedtime > datetime.now() - timedelta(hours=24),
             filename.c.filenameid == files.c.filenameid,
             path.c.pathid == files.c.pathid
             )
         )
     out_res = db.execute(s)
     proceed_result[job_i] = show_decoded_big_files_results(out_res, 10)
-  return render_template('bigfiles_report.html', title='Big files report', bf_report=proceed_result, res=result)
+    sched_time[job_i] = res[1].strftime("%Y-%m-%d %H:%M:%S")
+  return render_template('bigfiles_report.html', title='Big files report', bf_report=proceed_result, res=result, sched_time=sched_time)
 
 @app.route('/reports/pool_size_report', methods=['POST'])
 def pool_size_report():

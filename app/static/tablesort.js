@@ -3,7 +3,7 @@
     if (!(this instanceof Tablesort)) return new Tablesort(el, options);
 
     if (!el || el.tagName !== 'TABLE') {
-      throw new Error('Element must be a table');
+      throw new Error('Element must be a table' + el.tagName);
     }
     this.init(el, options || {});
   }

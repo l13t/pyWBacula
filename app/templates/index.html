@@ -12,21 +12,20 @@
     <h3 class="ui center aligned header">
       Backup for last 24 hours
     </h3>
-    <table class="ui fixed sortable striped right aligned table">
+    <table class="ui fixed sortable striped left aligned table">
       <thead>
         <tr>
-          <th class="left aligned">Client name</br> (Job name)</th>
+          <th>Client name</br> (Job name)</th>
           <th width=16%>Backup date</th>
           <th width=14%>Files count</th>
           <th width=14%>Backup</br> size</th>
-          <th width=14%>Status</th>
-          <th width=14%></th>
+          <th width=16%>Status</th>
         </tr>
       </thead>
       <tbody>
     {% for backup in last_backup %}
         <tr>
-          <td class="left aligned">{{ backup['name'] }} ({{ backup['bak_name'] }})</td>
+          <td class="left aligned">{{ backup['name'] }} (<a href="/reports/client/{{ backup['bak_name'] }}/{{ backup['date'] }}">{{ backup['bak_name'] }}</a>)</td>
           <td>{{ backup['date'] }}</td>
           <td>{{ backup['files'] }}</td>
           <td>{{ backup['size'] }}</td>
@@ -35,7 +34,6 @@
             {{ backup['status'] }}
             {% endautoescape %}
           </td>
-          <td><a href="/reports/client/{{ backup['bak_name'] }}/{{ backup['date'] }}" class="ui button">More</a></td>
         </tr>
     {% endfor %}
       </tbody>

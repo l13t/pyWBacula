@@ -1,4 +1,5 @@
 {%- include 'header.html' %}
+{%- include 'tables.html' %}
 
 <div class="ui vertical stripe segment">
   <div class="ui middle aligned stackable grid container">
@@ -16,13 +17,13 @@
     </div>
     <div class="row">
       <div class="column">
-        <table class="ui fixed left aligned celled table">
+        <table class="ui sort fixed left aligned celled table" id="djob">
           <thead>
             <tr>
               <th>Pool name</th>
-              <th width=150px>Start time</th>
-              <th width=150px>Stop time</th>
-              <th width=150px>Duration time</th>
+              <th class="sort-header" width=150px>Start time</th>
+              <th class="sort-header" width=150px>Stop time</th>
+              <th class="sort-header" width=150px>Duration time</th>
             </tr>
           </thead>
           <tbody>
@@ -36,6 +37,10 @@
   {% endfor %}
           </tbody>
         </table>
+        <script>
+var tbl = document.getElementById('djob')
+new Tablesort(tbl, 'sort-up');
+        </script>
       </div>
     </div>
   </div>
