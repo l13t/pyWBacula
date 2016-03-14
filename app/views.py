@@ -1,7 +1,7 @@
 #### Import section ####
-from flask import render_template, request, send_from_directory, Flask, jsonify
-from app import app
-from app import db
+from flask import render_template, request, redirect, send_from_directory, Flask, jsonify
+from app import *
+#from app import db
 from sqlalchemy import desc, asc, cast, Date
 from sqlalchemy.sql import and_, or_, not_, select, func
 import os
@@ -312,3 +312,16 @@ def backup_duration(bddate):
   min_date = int(mktime((strptime(str(_min_date), "%Y-%m-%d %H:%M:%S"))))
   max_date = int(mktime((strptime(str(_max_date), "%Y-%m-%d %H:%M:%S"))))
   return render_template('backup_duration.html', title="Backup duration time", bd_result=bd_result, bddate=int(bddate), min_date=min_date, max_date=max_date)
+
+@app.route('/<fname>.html')
+def show_file(fname):
+  if fname == 'index':
+    return redirect("/", code=302)
+  else:
+    fi = open(custom_path+fname+".html", 'r')
+    text = fi.read()
+    title = re.compile('<title>(.*?)</title>', re.DOTALL |  re.IGNORECASE).findall(text)
+    text = re.sub("<head>.*?</head>", "", text, flags=re.DOTALL)
+    text = re.sub("<(html|body)>", "", text, flags=re.DOTALL)
+    text = re.sub("</(html|body)>", "", text, flags=re.DOTALL)
+    return render_template('static_files.html', title=''.join(title), text=text)

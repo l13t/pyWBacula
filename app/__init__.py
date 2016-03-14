@@ -14,6 +14,8 @@ from sqlalchemy import Table, Column, Integer, String, MetaData, ForeignKey, cre
 from app import config
 db = create_engine(config.DB_URI, echo=True)
 
+custom_path = config.CUSTOM_PATH
+
 from app import views
 import chartkick
 
