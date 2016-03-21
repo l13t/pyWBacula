@@ -283,7 +283,8 @@ def old_volumes():
       m.mediatype,
       m.volstatus,
       m.lastwritten,
-      m.volretention
+      m.volretention,
+      extract(epoch from (select (now() - m.lastwritten)))
     from
       media as m
     where
@@ -295,7 +296,7 @@ def old_volumes():
         mlastwr = media[3].strftime('%Y-%m-%d %H:%M:%S')
       else:
         mlastwr = "Never used"
-      _media.update({ str(media[0]) : { 'mtype': str(media[1]), 'mvolst': static_vars.VOLUME_STATUS_SEVERITY[str(media[2])], 'mlastwr': mlastwr, 'mvolret': int(media[4]) } })
+      _media.update({ str(media[0]) : { 'mtype': str(media[1]), 'mvolst': static_vars.VOLUME_STATUS_SEVERITY[str(media[2])], 'mlastwr': mlastwr, 'mvolret': int(media[4]), 'mlastdiff': int(media[5]) } })
     _pool[pool[0]]['vols'] = _media
     vol_list.update(_pool)
   return render_template('old_volumes.html', title="Not recycled volumes report", vol_list=vol_list)

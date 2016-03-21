@@ -1,4 +1,5 @@
 {%- include 'header.html' %}
+{%- include 'tables.html' %}
 
 <script src="/static/dist/components/tab.js"></script>
 <script src="/static/sinon.js"></script>
@@ -25,7 +26,7 @@ $( document ).ready(function() {
     <div class="ui{% if vol in flag_time %} active{% endif %} tab segment" data-tab="{{ vol }}">
       <h2>
       </h2>
-      <table class="ui fixed very basic collapsing celled table">
+      <table class="ui fixed very basic collapsing celled table"
         <tbody>
           <tr>
             <td>Pool name</td>
@@ -53,7 +54,7 @@ $( document ).ready(function() {
           </tr>
         </tbody>
       </table>
-      <table class="ui fixed celled striped table">
+      <table class="ui fixed celled striped table sort" id="oldvolumes">
         <thead>
           <tr>
             <th>Volume name</th>
@@ -65,7 +66,7 @@ $( document ).ready(function() {
         </thead>
         <tbody>
         {% for media, media_data in vol_data['vols'].items() %}
-          <tr>
+          <tr{% if media_data['mvolret'] - media_data['mlastdiff'] <= 0 %} class="negative"{% endif %}>
             <td>{{ media }}</td>
             <td>{{ media_data['mtype'] }}</td>
             <td>{% autoescape false %}{{ media_data['mvolst'] }}{% endautoescape %}</td>
@@ -75,6 +76,9 @@ $( document ).ready(function() {
         {% endfor %}
         </tbody>
       </table>
+      <script>
+new Tablesort(document.getElementById('oldvolumes'));
+      </script>
     </div>
       {% endfor %}
   </div>
