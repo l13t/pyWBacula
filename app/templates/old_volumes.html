@@ -54,7 +54,7 @@ $( document ).ready(function() {
           </tr>
         </tbody>
       </table>
-      <table class="ui fixed celled striped table sort" id="oldvolumes">
+      <table class="ui fixed celled striped table sort" id="oldvolumes-{{ vol }}">
         <thead>
           <tr>
             <th class="sort-header">Volume name</th>
@@ -77,7 +77,7 @@ $( document ).ready(function() {
         </tbody>
       </table>
       <script>
-new Tablesort(document.getElementById('oldvolumes'));
+new Tablesort(document.getElementById('oldvolumes-{{ vol }}'));
       </script>
     </div>
       {% endfor %}
