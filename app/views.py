@@ -369,8 +369,8 @@ def media_report(media):
   media_info_result['fwr'] = _media_info_result[4].strftime('%Y-%m-%d %H:%M:%S')
   media_info_result['lwr'] = _media_info_result[5].strftime('%Y-%m-%d %H:%M:%S')
   media_info_result['ldate'] = _media_info_result[6].strftime('%Y-%m-%d %H:%M:%S')
-  media_info_result['volbytes'] = int(_media_info_result[7])
-  media_info_result['volstatus'] = str(_media_info_result[8])
+  media_info_result['volbytes'] = sizeof_fmt(int(_media_info_result[7]))
+  media_info_result['volstatus'] = static_vars.VOLUME_STATUS_SEVERITY[str(_media_info_result[8])]
   media_info_result['enabled'] = str(_media_info_result[9])
   media_info_result['recycle'] = int(_media_info_result[10])
   media_info_result['volret'] = int(_media_info_result[11])

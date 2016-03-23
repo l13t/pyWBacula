@@ -27,7 +27,7 @@
             Volume status
           </td>
           <td>
-            {{ mir['volstatus'] }}
+            {% autoescape false %}{{ mir['volstatus'] }}{% endautoescape %}
           </td>
         </tr>
         <tr>
