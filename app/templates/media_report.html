@@ -1,0 +1,112 @@
+{%- include 'header.html' %}
+
+<div class="ui vertical stripe segment">
+  <div class="ui middle aligned stackable grid container">
+    <h3>Detailed information</h3>
+    <table class="ui compact celled definition table">
+      <tbody>
+        <tr>
+          <td>
+            Volume Name
+          </td>
+          <td>
+            {{ mir['volname'] }}
+          </td>
+        </tr>
+        <tr>
+          <td>
+            Volume label format
+          </td>
+          <td>
+            {{ mir['labelformat'] }}
+          </td>
+        </tr>
+        <tr>
+          <td>
+            Volume status
+          </td>
+          <td>
+            {{ mir['volstatus'] }}
+          </td>
+        </tr>
+        <tr>
+          <td>
+            Media type
+          </td>
+          <td>
+            {{ mir['mediatype'] }}
+          </td>
+        </tr>
+        <tr>
+          <td>
+            Volume size
+          </td>
+          <td>
+            {{ mir['volbytes'] }}
+          </td>
+        </tr>
+        <tr>
+          <td>
+            Pool name
+          </td>
+          <td>
+            {{ mir['poolname'] }}
+          </td>
+        </tr>
+        <tr>
+          <td>
+            Storage name
+          </td>
+          <td>
+            {{ mir['storagename'] }}
+          </td>
+        </tr>
+        <tr>
+          <td>
+            First write time
+          </td>
+          <td>
+            {{ mir['fwr'] }}
+          </td>
+        </tr>
+        <tr>
+          <td>
+            Last write time
+          </td>
+          <td>
+            {{ mir['lwr'] }}
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <h3>Jobs inside volume</h3>
+    <div class="ui row">
+    <table class="ui collapsing table">
+      <thead>
+        <tr>
+          <th>
+            Job name
+          </th>
+          <th>
+            Job schedule time
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+      {% for job in mir['jobs'] %}
+        <tr>
+          <td>
+            <a href="/reports/client/{{ job['job_name'] }}/{{ job['job_sched'] }}">{{ job['job_name'] }}</a>
+          </td>
+          <td>
+            {{ job['job_sched'] }}
+          </td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+    </div>
+  </div>
+</div>
+
+{%- include 'footer.html' %}

@@ -296,10 +296,12 @@ def old_volumes():
         mlastwr = media[3].strftime('%Y-%m-%d %H:%M:%S')
       else:
         mlastwr = "Never used"
+
       if media[5] != None:
         mlastdiff = int(media[5])
       else:
         mlastdiff = int(media[4])
+      
       _media.update({ str(media[0]) : { 'mtype': str(media[1]), 'mvolst': static_vars.VOLUME_STATUS_SEVERITY[str(media[2])], 'mlastwr': mlastwr, 'mvolret': int(media[4]), 'mlastdiff': mlastdiff } })
     _pool[pool[0]]['vols'] = _media
     vol_list.update(_pool)
@@ -330,3 +332,71 @@ def show_file(fname):
     text = re.sub("<(html|body)>", "", text, flags=re.DOTALL)
     text = re.sub("</(html|body)>", "", text, flags=re.DOTALL)
     return render_template('static_files.html', title=''.join(title), text=text)
+
+@app.route('/reports/media/<media>')
+def media_report(media):
+  media_info_query = """
+  select
+    m.volumename,
+    p.name,
+    p.labelformat,
+    m.mediatype,
+    m.firstwritten,
+    m.lastwritten,
+    m.labeldate,
+    m.volbytes,
+    m.volstatus,
+    m.enabled,
+    m.recycle,
+    m.volretention,
+    s.name,
+    m.recyclecount
+  from
+    media as m,
+    pool as p,
+    storage as s
+  where
+    p.poolid = m.poolid and
+    m.storageid = s.storageid and
+    m.volumename = '""" + media + """';
+  """
+  _media_info_result = db.execute(media_info_query).fetchone()
+  media_info_result = {}
+  media_info_result['volname'] = str(_media_info_result[0])
+  media_info_result['poolname'] = str(_media_info_result[1])
+  media_info_result['labelformat'] = str(_media_info_result[2])
+  media_info_result['mediatype'] = str(_media_info_result[3])
+  media_info_result['fwr'] = _media_info_result[4].strftime('%Y-%m-%d %H:%M:%S')
+  media_info_result['lwr'] = _media_info_result[5].strftime('%Y-%m-%d %H:%M:%S')
+  media_info_result['ldate'] = _media_info_result[6].strftime('%Y-%m-%d %H:%M:%S')
+  media_info_result['volbytes'] = int(_media_info_result[7])
+  media_info_result['volstatus'] = str(_media_info_result[8])
+  media_info_result['enabled'] = str(_media_info_result[9])
+  media_info_result['recycle'] = int(_media_info_result[10])
+  media_info_result['volret'] = int(_media_info_result[11])
+  media_info_result['storagename'] = str(_media_info_result[12])
+  media_info_result['reccount'] = int(_media_info_result[13])
+  job_inside_media_query = """
+  select
+    j.name,
+    j.schedtime,
+    p.name,
+    m.volumename
+  from
+    pool as p,
+    job as j,
+    media as m
+  where
+    j.poolid = p.poolid and
+    m.volumename = '""" + media + """' and
+    m.poolid = p.poolid;
+  """
+  job_inside_media_result = db.execute(job_inside_media_query).fetchall()
+  job_inside_media_list = []
+  for jiml_id, jiml_data in enumerate(job_inside_media_result):
+    job_inside_media_list.append({ 'job_name': str(jiml_data[0]), 'job_sched': jiml_data[1].strftime('%Y-%m-%d %H:%M:%S') })
+
+  media_info_result['jobs'] = job_inside_media_list
+
+  return render_template('media_report.html', title="Detailed information about volume " + media, mir=media_info_result)
+

@@ -10,7 +10,10 @@ $( document ).ready(function() {
         $('.menu .item').tab({ history: false });
 
             });
-// ]]></script>
+// ]]>
+
+
+</script>
 
 <div class="ui vertical footer segment">
   <h2>Volume usage report</h2>
@@ -67,7 +70,7 @@ $( document ).ready(function() {
         <tbody>
         {% for media, media_data in vol_data['vols'].items() %}
           <tr{% if media_data['mvolret'] - media_data['mlastdiff'] <= 0 %} class="negative"{% endif %}>
-            <td>{{ media }}</td>
+            <td><a href="/reports/media/{{ media }}">{{ media }}</a></td>
             <td>{{ media_data['mtype'] }}</td>
             <td>{% autoescape false %}{{ media_data['mvolst'] }}{% endautoescape %}</td>
             <td>{{ media_data['mlastwr'] }}</td>
