@@ -1,4 +1,5 @@
 {%- include 'header.html' %}
+{%- include 'tables.html' %}
 
 <div class="ui vertical stripe segment">
   <div class="ui middle aligned stackable grid container">
@@ -81,13 +82,16 @@
     </table>
     <h3>Jobs inside volume</h3>
     <div class="ui row">
-    <table class="ui collapsing table">
+    <table class="ui collapsing table sort" id='jobsinmedia'>
       <thead>
         <tr>
-          <th>
+          <th class="sort-header">
+            JobID
+          </th>
+          <th class="sort-header">
             Job name
           </th>
-          <th>
+          <th class="sort-header">
             Job schedule time
           </th>
         </tr>
@@ -95,6 +99,9 @@
       <tbody>
       {% for job in mir['jobs'] %}
         <tr>
+          <td>
+            {{ job['jobid'] }}
+          </td>
           <td>
             <a href="/reports/client/{{ job['job_name'] }}/{{ job['job_sched'] }}">{{ job['job_name'] }}</a>
           </td>
@@ -105,6 +112,9 @@
       {% endfor %}
       </tbody>
     </table>
+    <script>
+    new Tablesort(document.getElementById('jobsinmedia'));
+    </script>
     </div>
   </div>
 </div>

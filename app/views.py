@@ -380,21 +380,24 @@ def media_report(media):
   select
     j.name,
     j.schedtime,
-    p.name,
+    j.jobid,
     m.volumename
   from
-    pool as p,
     job as j,
-    media as m
+    media as m,
+    jobmedia as jm
   where
-    j.poolid = p.poolid and
     m.volumename = '""" + media + """' and
-    m.poolid = p.poolid;
+    m.mediaid = jm.mediaid and
+    jm.jobid = j.jobid
+  group by
+    j.jobid,
+    m.volumename;
   """
   job_inside_media_result = db.execute(job_inside_media_query).fetchall()
   job_inside_media_list = []
   for jiml_id, jiml_data in enumerate(job_inside_media_result):
-    job_inside_media_list.append({ 'job_name': str(jiml_data[0]), 'job_sched': jiml_data[1].strftime('%Y-%m-%d %H:%M:%S') })
+    job_inside_media_list.append({ 'job_name': str(jiml_data[0]), 'job_sched': jiml_data[1].strftime('%Y-%m-%d %H:%M:%S'), 'jobid': int(jiml_data[2]) })
 
   media_info_result['jobs'] = job_inside_media_list
 
