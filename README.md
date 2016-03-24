@@ -17,3 +17,61 @@ So as a result I start writing own web reports interface.
 * requirements.txt contains modules which I use in my web interface
 * css is based on SemanticUI (http://semantic-ui.com/)
 * for database connection I use SQLAlchemy
+
+# Installation
+
+## Download
+
+`git clone https://github.com/l13t/pyWBacula.git`
+
+## Prepare and enable virtual enviroment
+
+```
+cd pyWBacula
+virtualenv venv
+source venv/bin/activate
+```
+
+## Install python modules
+
+`pip install -r requirements.txt`
+
+## Modify configuration files
+
+After downloading you should rename next configuration files:
+
+`cp config.py.example config.py
+cp app/config.py.example app/config.py`
+
+### app/config.py syntax
+
+* DB_URI:
+
+`DB_URI = 'postgresql://<user>:<password>@<host>:<port>/<db_name>?client_encoding=utf8'`
+
+> Currently only PostgreSQL supported.
+
+# Run application
+
+## Run in standalone mode
+
+You can use _run.py_ to start application:
+
+`./run.py`
+
+Or you can use gunicorn:
+
+`venv/bin/gunicorn --bind 0.0.0.0:15995 run:app`
+
+## Run on startup
+
+To run on startup just do next steps:
+
+```
+cp utils/pywbacula /etc/init.d/
+chmod 755 /etc/init.d/pywbacula && chown root:root /etc/init.d/pywbacula
+update-rc.d pywbacula defaults
+update-rc.d pywbacula enable
+```
+
+Edit /etc/init.d/pywbacula to change WWW\_HOME and APP\_USER variables.

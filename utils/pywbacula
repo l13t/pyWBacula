@@ -1,0 +1,53 @@
+#! /bin/sh
+### BEGIN INIT INFO
+# Provides: pywbacula
+# Required-Start: $local_fs $network $syslog
+# Required-Stop: $local_fs $network $syslog
+# Default-Start: 2 3 4 5
+# Default-Stop: 0 1 6
+# Short-Description: pyWBacula
+# Description: This file starts and stops pyWBacula application
+# 
+### END INIT INFO
+
+WWW_HOME="/opt/pyWBacula"
+APP_USER=www-data
+
+start() {
+  if [ -f "$WWW_HOME/log/pywbacula.pid" ] && kill -0 $(cat "$WWW_HOME/log/pywbacula.pid"); then
+    echo 'Service already running' >&2
+    return 1
+  fi
+  echo 'Starting service…' >&2
+  su $APP_USER -c "export HOME=$WWW_HOME && cd $WWW_HOME && source venv/bin/activate && venv/bin/gunicorn -D --reload -t 90 -w 10 -p $WWW_HOME/log/pywbacula.pid --bind 0.0.0.0:15995 run:app" -s /bin/bash
+  echo 'Service started' >&2
+}
+
+stop() {
+  if [ ! -f "$WWW_HOME/log/pywbacula.pid" ] || ! kill -0 $(cat "$WWW_HOME/log/pywbacula.pid"); then
+    echo 'Service not running' >&2
+    return 1
+  fi
+  echo 'Stopping service…' >&2
+  kill -15 $(cat "$WWW_HOME/log/pywbacula.pid") && rm -f "$WWW_HOME/log/pywbacula.pid"
+  echo 'Service stopped' >&2
+}
+
+case "$1" in
+ start)
+   start
+   ;;
+ stop)
+   stop
+   ;;
+ restart)
+   stop
+   sleep 5
+   start
+   ;;
+ *)
+   echo "Usage: pywbacula {start|stop|restart}" >&2
+   exit 3
+   ;;
+esac
+
