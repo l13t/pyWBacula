@@ -132,24 +132,24 @@ def big_files_report():
 def pool_size_report():
   s = """
   select
-  pool.name as pool_name, job.schedtime as job_schedtime, sum(job.jobbytes) as pool_size
+    pool_name, job_schedtime, sum(pool_size) as pool_size
+  from (select
+    pool.name as pool_name, date_trunc('day', job.schedtime) as job_schedtime, job.jobbytes as pool_size
   from
-  pool, job
+    pool, job
   where
-  job.schedtime > now() - interval '28 days' and job.poolid = pool.poolid
-  group by
-  pool.name, job.schedtime
+    date_trunc('day', job.schedtime) > now() - interval '28 days' and job.poolid = pool.poolid
   union
   select
-  pool.name as pool_name, jobhisto.schedtime as job_schedtime, sum(jobhisto.jobbytes) as pool_size
+    pool.name as pool_name, date_trunc('day', jobhisto.schedtime) as job_schedtime, jobhisto.jobbytes as pool_size
   from
-  pool, jobhisto
+    pool, jobhisto
   where
-  jobhisto.schedtime > now() - interval '28 days' and jobhisto.poolid = pool.poolid
-  group by
-  pool.name, jobhisto.schedtime
+    date_trunc('day', jobhisto.schedtime) > now() - interval '28 days' and jobhisto.poolid = pool.poolid
   order by
-  job_schedtime, pool_name
+    job_schedtime, pool_name) as foo
+  group by pool_name, job_schedtime
+  order by job_schedtime, pool_name;
   """
   result = db.execute(s).fetchall()
   s_s_result = gen_chart_array_time_3d(result)
