@@ -75,3 +75,11 @@ update-rc.d pywbacula enable
 ```
 
 Edit /etc/init.d/pywbacula to change WWW\_HOME and APP\_USER variables.
+
+## Grafana+InfluxDB reports
+
+In utils you can find scripts which would help you create graph reports with Grafana+InfluxDB.
+
+* utils/bacula\_to\_influx - custom cronjob to push data to InfluxDB
+* utils/results\_to\_influx.sh - script which push data to InfluxDB
+* utils/grafana\_panel\_template.json - dashboard template for Grafana to show results
