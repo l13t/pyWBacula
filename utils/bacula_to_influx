@@ -1,0 +1,2 @@
+### Cronjob to run results_to_influx.sh
+15 9 * * * <path_to>/results_to_influx.sh
