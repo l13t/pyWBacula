@@ -20,7 +20,7 @@ where
 order by
   job_schedtime, pool_name) as foo
 group by pool_name, job_schedtime
-order by job_schedtime, pool_name;" | awk -F"," '{printf "bacula,host=%s value=%s %s\n", $1, $3, $2}' > /tmp/bacula.txt
+order by job_schedtime, pool_name;" | awk -F"," '{printf "bacula,host=%s,type=size value=%s %s000000\nbacula,host=%s,type=fcount value=%s %s000000\n", $1, $3, $2, $1, $4, $2}' > /tmp/bacula.txt
 # push data to influxdb
 # modify this command if you use login and password for influxdb
 curl -H 'Content-Type: text/plain' -i -XPOST 'http://localhost:8086/write?db=bacula' --data-binary @/tmp/bacula.txt
