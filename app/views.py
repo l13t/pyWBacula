@@ -199,7 +199,7 @@ def client_detailed_info(host_name, bdate):
       'files_list': backup_files_list,
       'jlevel': static_vars.JobLevel[j_level],
     })
-  s1 = select([client.c.name, job.c.name, job.c.schedtime, job.c.jobfiles, job.c.jobbytes],  use_labels=True).where(and_(client.c.clientid == job.c.clientid, jobhist.c.schedtime > date.today() - timedelta(days=14), job.c.name == host_name))
+  s1 = select([client.c.name, job.c.name, job.c.schedtime, job.c.jobfiles, job.c.jobbytes],  use_labels=True).where(and_(client.c.clientid == job.c.clientid, job.c.schedtime > date.today() - timedelta(days=14), job.c.name == host_name))
   s2 = select([client.c.name, jobhist.c.name.label('job_name'), jobhist.c.schedtime, jobhist.c.jobfiles, jobhist.c.jobbytes],  use_labels=True).where(and_(client.c.clientid == jobhist.c.clientid, jobhist.c.schedtime > date.today() - timedelta(days=14), jobhist.c.name == host_name))
   query = s1.union(s2).alias('job_name')
   result = db.execute(query).fetchall()
