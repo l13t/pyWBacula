@@ -10,7 +10,7 @@ Jinja2==2.9.5
 MarkupSafe==0.23
 psycopg2==2.7
 pygal==2.3.1
-PyMySQL==0.6.7
+PyMySQL==0.7.10
 requests==2.8.1
 SQLAlchemy==1.0.9
 Werkzeug==0.10.4
