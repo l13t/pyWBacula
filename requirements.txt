@@ -4,7 +4,7 @@ Flask-Bower==1.2.1
 Flask-HTTPAuth==3.2.2
 Flask-Login==0.4.0
 Flask-SQLAlchemy==2.2
-gunicorn==19.4.5
+gunicorn==19.6.0
 itsdangerous==0.24
 Jinja2==2.8
 MarkupSafe==0.23
