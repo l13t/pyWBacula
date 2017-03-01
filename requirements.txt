@@ -1,4 +1,4 @@
-chartkick==0.4.2
+chartkick==0.5.0
 Flask==0.10.1
 Flask-Bower==1.2.1
 Flask-HTTPAuth==2.7.0
