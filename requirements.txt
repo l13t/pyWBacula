@@ -6,7 +6,7 @@ Flask-Login==0.4.0
 Flask-SQLAlchemy==2.2
 gunicorn==19.6.0
 itsdangerous==0.24
-Jinja2==2.8
+Jinja2==2.9.5
 MarkupSafe==0.23
 psycopg2==2.6.1
 pygal==2.0.9
