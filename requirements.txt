@@ -8,7 +8,7 @@ gunicorn==19.7.1
 itsdangerous==0.24
 Jinja2==2.9.6
 MarkupSafe==1.0
-psycopg2==2.7
+psycopg2==2.7.3
 pygal==2.3.1
 PyMySQL==0.7.10
 SQLAlchemy==1.1.12
