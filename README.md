@@ -86,3 +86,8 @@ In utils you can find scripts which would help you create graph reports with Gra
 
 [![Updates](https://pyup.io/repos/github/l13t/pyWBacula/shield.svg)](https://pyup.io/repos/github/l13t/pyWBacula/)
 [![Python 3](https://pyup.io/repos/github/l13t/pyWBacula/python-3-shield.svg)](https://pyup.io/repos/github/l13t/pyWBacula/)
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fl13t%2FpyWBacula.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fl13t%2FpyWBacula?ref=badge_shield)
+
+
+## License
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fl13t%2FpyWBacula.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fl13t%2FpyWBacula?ref=badge_large)
