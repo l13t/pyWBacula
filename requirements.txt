@@ -10,7 +10,7 @@ MarkupSafe==1.0
 Werkzeug==0.12.2
 PyMySQL==0.7.11
 pygal==2.4.0
-psycopg2==2.7.3
+psycopg2==2.7.5
 SQLAlchemy==1.1.12
 requests==2.18.2
 wheel==0.29.0
