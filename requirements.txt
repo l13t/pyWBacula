@@ -5,12 +5,12 @@ Flask-Login
 Flask-SQLAlchemy
 gunicorn==19.7.1
 itsdangerous==0.24
-Jinja2==2.9.6
+Jinja2
 MarkupSafe==1.0
 Werkzeug==0.12.2
 PyMySQL
 pygal==2.4.0
 psycopg2==2.7.3
 SQLAlchemy
-requests==2.18.2
+requests
 wheel==0.29.0
