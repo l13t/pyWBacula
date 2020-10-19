@@ -1,73 +1,87 @@
-# pyWBacula v0.1
+# pyWBacula
+
 Another one simple bacula web reports interface.
 
 I wasn't satisfied with current web interfaces for bacula. Cause they show default information which I can get from console and doesn't show really useful information (like big files in backup, long-running-backups etc).
 
 So as a result I start writing own web reports interface.
 
-#Requirements
+## Requirements
+
 * Enabled bacula history for jobs
 * PostgreSQL database (I use postgres on all my servers with bacula)
 * python Flask
 
-#Documentation
+## Documentation
+
 [Instalation notes](https://github.com/l13t/pyWBacula/wiki/Installation)
 
-#Notes
+## Notes
+
 * requirements.txt contains modules which I use in my web interface
-* css is based on SemanticUI (http://semantic-ui.com/)
+* css is based on [SemanticUI](http://semantic-ui.com/)
 * for database connection I use SQLAlchemy
 
-# Installation
+## Installation
 
-## Download
+### Download
 
-`git clone https://github.com/l13t/pyWBacula.git`
-
-## Prepare and enable virtual enviroment
-
+```shell
+git clone https://github.com/l13t/pyWBacula.git
 ```
+
+### Prepare and enable virtual enviroment
+
+```shell
 cd pyWBacula
 virtualenv venv
 source venv/bin/activate
 ```
 
-## Install python modules
+### Install python modules
 
 `pip install -r requirements.txt`
 
-## Modify configuration files
+### Modify configuration files
 
 After downloading you should rename next configuration files:
 
-`cp config.py.example config.py
-cp app/config.py.example app/config.py`
+```shell
+cp config.py.example config.py
+cp app/config.py.example app/config.py
+```
 
-### app/config.py syntax
+#### app/config.py syntax
 
 * DB_URI:
 
-`DB_URI = 'postgresql://<user>:<password>@<host>:<port>/<db_name>?client_encoding=utf8'`
+```ini
+DB_URI = 'postgresql://<user>:<password>@<host>:<port>/<db_name>?client_encoding=utf8'
+```
 
 > Currently only PostgreSQL supported.
 
-# Run application
+## Run application
 
-## Run in standalone mode
+### Run in standalone mode
 
 You can use _run.py_ to start application:
 
-`./run.py`
+```shell
+./run.py
+```
 
 Or you can use gunicorn:
 
-`venv/bin/gunicorn --bind 0.0.0.0:15995 run:app`
+```shell
+venv/bin/gunicorn --bind 0.0.0.0:15995 run:app
+```
 
-## Run on startup
+### Run on startup
 
 To run on startup just do next steps:
 
-```
+```shell
 cp utils/pywbacula /etc/init.d/
 chmod 755 /etc/init.d/pywbacula && chown root:root /etc/init.d/pywbacula
 update-rc.d pywbacula defaults
@@ -76,7 +90,7 @@ update-rc.d pywbacula enable
 
 Edit /etc/init.d/pywbacula to change WWW\_HOME and APP\_USER variables.
 
-## Grafana+InfluxDB reports
+### Grafana+InfluxDB reports
 
 In utils you can find scripts which would help you create graph reports with Grafana+InfluxDB.
 
@@ -84,7 +98,4 @@ In utils you can find scripts which would help you create graph reports with Gra
 * utils/results\_to\_influx.sh - script which push data to InfluxDB
 * utils/grafana\_panel\_template.json - dashboard template for Grafana to show results
 
-                
 [![Known Vulnerabilities](https://snyk.io/test/github/l13t/pyWBacula:requirements.txt/badge.svg?targetFile=requirements.txt)](https://snyk.io/test/github/l13t/pyWBacula:requirements.txt?targetFile=requirements.txt)
-
-              

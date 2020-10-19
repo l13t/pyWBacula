@@ -12,6 +12,7 @@ LEVELS = {
     ' ': 'Restore/Admin',
     'f': 'Virtual full',
 }
+
 TYPES = {
     'B': 'Backup',
     'M': 'Migrated',
@@ -25,6 +26,7 @@ TYPES = {
     'g': 'Migration',
     'S': 'Scan',
 }
+
 VOLUME_STATUS_SEVERITY = {
     "Append": 'ok',
     "Archive": 'unknown',
@@ -37,4 +39,3 @@ VOLUME_STATUS_SEVERITY = {
     "Read-Only": 'unknown',
     "Error": 'error',
 }
-
