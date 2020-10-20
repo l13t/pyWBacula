@@ -8,6 +8,7 @@ __email__ = "liet@liet.kiev.ua"
 __status__ = "Development"
 
 from app import app
+import os
 
 if __name__ == '__main__':
     DEBUG = os.getenv(PWB_DEBUG, default=False)
