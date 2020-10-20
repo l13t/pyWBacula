@@ -1,5 +1,6 @@
 from app import config
 from flask import Flask, Blueprint
+from sqlalchemy import create_engine
 import chartkick
 
 app = Flask(__name__)
