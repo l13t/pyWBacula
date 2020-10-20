@@ -11,6 +11,6 @@ from app import app
 import os
 
 if __name__ == '__main__':
-    DEBUG = os.getenv(PWB_DEBUG, default=False)
-    PORT = os.getenv(PWB_PORT, default=15995)
+    DEBUG = os.getenv("PWB_DEBUG", default="False")
+    PORT = os.getenv("PWB_PORT", default="15995")
     app.run(host='0.0.0.0', port=PORT, debug=DEBUG)
