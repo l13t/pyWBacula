@@ -3,7 +3,7 @@ from flask import render_template, request, redirect, send_from_directory
 from sqlalchemy import cast, Date
 from sqlalchemy.sql import and_, select, func
 from time import gmtime, strptime, mktime
-import app
+from app import app, db
 import lib
 import os
 import re
@@ -40,7 +40,7 @@ def index():
     FROM client, jobhisto
     WHERE client.clientid = jobhisto.clientid AND jobhisto.schedtime > now() - interval '28 days';
     """
-    result = app.db.execute(query).fetchall()
+    result = db.execute(query).fetchall()
     b_s_res = []
     b_c_res = []
     detailed_result_last_day = []
@@ -93,7 +93,7 @@ def jobs_report():
            job.jobfiles AS job_jobfiles, job.jobbytes AS job_jobbytes, job.level as job_level FROM client,
            job, (select max(job.schedtime) as max_schedtime, job.name AS job_name from job group by job.name) as lj
            where lj.job_name = job.name and job.schedtime = lj.max_schedtime and client.clientid = job.clientid"""
-    query_result = app.db.execute(s).fetchall()
+    query_result = db.execute(s).fetchall()
     result = []
     for i, res in enumerate(query_result):
         cname = res[0]
@@ -136,7 +136,7 @@ def big_files_report():
     # if request.method == 'POST':
     #     _max_size = int(request.form['_max_size'])
     s = select([job.c.name, job.c.schedtime]).where(job.c.schedtime > datetime.now() - timedelta(hours=24))
-    result = app.db.execute(s).fetchall()
+    result = db.execute(s).fetchall()
     proceed_result = {}
     sched_time = {}
     for res in result:
@@ -148,7 +148,7 @@ def big_files_report():
                  filename.c.filenameid == files.c.filenameid,
                  path.c.pathid == files.c.pathid
                  ))
-        out_res = app.db.execute(s)
+        out_res = db.execute(s)
         proceed_result[job_i] = lib.show_decoded_big_files_results(out_res, 10)
         sched_time[job_i] = res[1].strftime("%Y-%m-%d %H:%M:%S")
     return render_template('bigfiles_report.html',
@@ -181,7 +181,7 @@ def pool_size_report():
     group by pool_name, job_schedtime
     order by job_schedtime, pool_name;
     """
-    result = app.db.execute(s).fetchall()
+    result = db.execute(s).fetchall()
     s_s_result = lib.gen_chart_array_time_3d(result)
     return render_template("pool_size.html",
                            title='Pool size report',
@@ -205,7 +205,7 @@ def client_detailed_info(host_name, bdate):
                                            cast(job.c.schedtime, Date) == bdate,
                                            job.c.name == host_name,
                                            job.c.schedtime == bdate))
-    _short_res = app.db.execute(s).fetchall()
+    _short_res = db.execute(s).fetchall()
     short_res = []
     for i, _short in enumerate(_short_res):
         c_name = _short[0]
@@ -225,7 +225,7 @@ def client_detailed_info(host_name, bdate):
                  filename.c.filenameid == files.c.filenameid,
                  path.c.pathid == files.c.pathid
                  ))
-        f_res = app.db.execute(f_sel).fetchall()
+        f_res = db.execute(f_sel).fetchall()
         backup_files_list = []
         for record in f_res:
             backup_files_list.append(lib.decode_file_info(record))
@@ -260,7 +260,7 @@ def client_detailed_info(host_name, bdate):
                                             jobhist.c.schedtime > date.today() - timedelta(days=14),
                                             jobhist.c.name == host_name))
     query = s1.union(s2).alias('job_name')
-    result = app.db.execute(query).fetchall()
+    result = db.execute(query).fetchall()
     b_s_res = []
     b_c_res = []
     for j, tmp in enumerate(result):
@@ -291,7 +291,7 @@ def long_running_backups():
                 job.c.jobid]).where(and_(job.c.schedtime > datetime.now() - timedelta(hours=24),
                                          client.c.clientid == job.c.clientid,
                                          job.c.starttime + timedelta(minutes=30) < job.c.endtime))
-    result = app.db.execute(s).fetchall()
+    result = db.execute(s).fetchall()
     long_job = []
     for j, tmp in enumerate(result):
         cname = tmp[0]
@@ -334,7 +334,7 @@ def old_volumes():
     from
       pool as p
     """
-    pools = app.db.execute(s).fetchall()
+    pools = db.execute(s).fetchall()
     for i, pool in enumerate(pools):
         _pool = {str(pool[0]): {'ppid': int(pool[1]),
                                 'pvolret': int(pool[2]),
@@ -355,7 +355,7 @@ def old_volumes():
           media as m
         where
           m.poolid = """ + str(_pool[pool[0]]['ppid'])
-        medias = app.db.execute(st).fetchall()
+        medias = db.execute(st).fetchall()
         _media = {}
         for j, media in enumerate(medias):
             if media[3] is not None:
@@ -386,14 +386,14 @@ def backup_duration(bddate):
                use_labels=True).where(and_(job.c.poolid == pool.c.poolid,
                                            cast(job.c.schedtime, Date) <= datetime.fromtimestamp(float(bddate)),
                                            cast(job.c.schedtime, Date) >= datetime.fromtimestamp(float(bddate)) - timedelta(days=1))).group_by(pool.c.name, job.c.schedtime)
-    bd = app.db.execute(s).fetchall()
+    bd = db.execute(s).fetchall()
     bd_result = {}
     for bpool in bd:
         bd_result.update({bpool[0]: {'start': bpool[1], 'end': bpool[2]}})
     s = select([func.min(job.c.starttime),
                 func.max(job.c.endtime)],
                use_labels=True).where(job.c.poolid == pool.c.poolid)
-    _min_date, _max_date = app.db.execute(s).fetchone()
+    _min_date, _max_date = db.execute(s).fetchone()
     min_date = int(mktime((strptime(str(_min_date), "%Y-%m-%d %H:%M:%S"))))
     max_date = int(mktime((strptime(str(_max_date), "%Y-%m-%d %H:%M:%S"))))
     return render_template('backup_duration.html',
@@ -445,7 +445,7 @@ def media_report(media):
       m.storageid = s.storageid and
       m.volumename = '""" + media + """';
     """
-    _media_info_result = app.db.execute(media_info_query).fetchone()
+    _media_info_result = db.execute(media_info_query).fetchone()
     media_info_result = {}
     media_info_result['volname'] = str(_media_info_result[0])
     media_info_result['poolname'] = str(_media_info_result[1])
@@ -479,7 +479,7 @@ def media_report(media):
       j.jobid,
       m.volumename;
     """
-    job_inside_media_result = app.db.execute(job_inside_media_query).fetchall()
+    job_inside_media_result = db.execute(job_inside_media_query).fetchall()
     job_inside_media_list = []
     for jiml_id, jiml_data in enumerate(job_inside_media_result):
         job_inside_media_list.append({'job_name': str(jiml_data[0]),
