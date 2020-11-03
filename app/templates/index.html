@@ -1,13 +1,17 @@
 {%- include 'header.html' %}
 {%- include 'tables.html' %}
+<script src="http://www.google.com/jsapi"></script>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+<script src="http://code.highcharts.com/highcharts.js"></script>
+
 <div class="ui vertical footer segment">
 <div class="ui two column stackable grid">
   <div class="column">
     <h3 class="ui center aligned header">
       Backup sizes and files count for the last two months
     </h3>
-{% line_chart b_size with library={ "xAxis":{"title":{"text":"Date period"}}, "yAxis":{"title":{"text":"Backup size in Bytes"}}, "title": {"text": "Bacula backup sizes"} } %}
-{% line_chart b_count with library={ "xAxis":{"title":{"text":"Date period"}}, "yAxis":{"title":{"text":"Files count in backup"}}, "title": {"text": "Bacula backup files count"}} %}
+{% line_chart b_size with library={ 'xAxis':{'title':{'text':'Date period'}}, 'yAxis':{'title':{'text':'Backup size in Bytes'}}, 'title': {'text': 'Bacula backup sizes'} } %}
+{% line_chart b_count with library={ 'xAxis':{'title':{'text':'Date period'}}, 'yAxis':{'title':{'text':'Files count in backup'}}, 'title': {'text': 'Bacula backup files count'}} %}
   </div>
   <div class="column">
     <h3 class="ui center aligned header">

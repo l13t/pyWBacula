@@ -11,7 +11,7 @@ def gen_chart_array_time_3d(in_data):
             tmp_result[str(x)] = dict([(y.strftime('%Y-%m-%d %H:%M:%S'),
                                         int(z))])
     last_result = []
-    for res_key, res_val in tmp_result:
+    for res_key, res_val in tmp_result.items():
         temp = dict([('name', res_key), ('data', res_val)])
         last_result.append(temp)
     return last_result

@@ -13,3 +13,5 @@ requests
 SQLAlchemy
 werkzeug
 wheel
+flask_debug
+gviz_api
