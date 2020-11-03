@@ -98,4 +98,4 @@ In utils you can find scripts which would help you create graph reports with Gra
 * utils/results\_to\_influx.sh - script which push data to InfluxDB
 * utils/grafana\_panel\_template.json - dashboard template for Grafana to show results
 
-[![Known Vulnerabilities](https://snyk.io/test/github/l13t/pyWBacula:requirements.txt/badge.svg?targetFile=requirements.txt)](https://snyk.io/test/github/l13t/pyWBacula:requirements.txt?targetFile=requirements.txt)
+[![Known Vulnerabilities](https://snyk.io/test/github/l13t/pyWBacula/badge.svg)](https://snyk.io/test/github/l13t/pyWBacula)
