@@ -3,7 +3,7 @@ Flask-HTTPAuth
 Flask
 Flask-Login
 Flask-SQLAlchemy
-gunicorn==19.7.1
+gunicorn==19.10.0
 itsdangerous==0.24
 Jinja2
 MarkupSafe==1.0
