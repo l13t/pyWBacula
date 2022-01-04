@@ -8,6 +8,10 @@ from app.db import db
 import config
 import os
 import re
+import pandas as pd
+import json
+import plotly
+import plotly.express as px
 
 reports = Blueprint('reports', __name__)
 
@@ -139,7 +143,8 @@ def pool_size_report():
         job_schedtime, pool_name;
     """
     result = db.execute(s).fetchall()
-    s_s_result = pwb.gen_chart_array_time_3d(result)
+    # s_s_result = pwb.gen_chart_array_time_3d(result)
+    s_s_result = pwb.gen_graph_json(["Pool name", "Scheduled time", "Pool size in Bytes"], result, "Bacula pools size history")
     return render_template("pool_size.html",
                            title='Pool size report',
                            s_size=s_s_result)
@@ -164,11 +169,11 @@ def client_detailed_info(host_name, bdate):
     #                                        job.c.schedtime == bdate))
     query = """
     SELECT
-        client.name, job.name, job.jobstatus, job.schedtime, job.jobfiles, job.jobid, job.level, job.starttime, job.endtime
+        client.name, job.name, job.jobstatus, job.schedtime, job.jobfiles, job.jobbytes, job.jobid, job.level, job.starttime, job.endtime
     FROM
         job, client
     WHERE
-        client.clientid = job.clientid AND job.name = {} AND job.schedtime = {}
+        client.clientid = job.clientid AND job.name = '{}' AND job.schedtime = '{}'
     """.format(host_name, bdate)
     _short_res = db.execute(query).fetchall()
     short_res = []
@@ -196,7 +201,7 @@ def client_detailed_info(host_name, bdate):
         FROM
             path, filename, file, job
         WHERE
-            job.name = {} AND job.jobid = files.jobid NAD job.schedtime = {} AND filename.filenameid = file.filenameid AND path.pathid = file.pathid
+            job.name = '{}' AND job.jobid = file.jobid AND job.schedtime = '{}' AND filename.filenameid = file.filenameid AND path.pathid = file.pathid
         """.format(host_name, bdate)
         f_res = db.execute(f_sel).fetchall()
         backup_files_list = []
@@ -216,23 +221,38 @@ def client_detailed_info(host_name, bdate):
                           'files_list': backup_files_list,
                           'jlevel': static_vars.JobLevel[j_level],
                           })
-    s1 = select([client.c.name,
-                 job.c.name,
-                 job.c.schedtime,
-                 job.c.jobfiles,
-                 job.c.jobbytes],
-                use_labels=True).where(and_(client.c.clientid == job.c.clientid,
-                                            job.c.schedtime > date.today() - timedelta(days=14),
-                                            job.c.name == host_name))
-    s2 = select([client.c.name,
-                 jobhist.c.name.label('job_name'),
-                 jobhist.c.schedtime,
-                 jobhist.c.jobfiles,
-                 jobhist.c.jobbytes],
-                use_labels=True).where(and_(client.c.clientid == jobhist.c.clientid,
-                                            jobhist.c.schedtime > date.today() - timedelta(days=14),
-                                            jobhist.c.name == host_name))
-    query = s1.union(s2).alias('job_name')
+    # s1 = select([client.c.name,
+    #              job.c.name,
+    #              job.c.schedtime,
+    #              job.c.jobfiles,
+    #              job.c.jobbytes],
+    #             use_labels=True).where(and_(client.c.clientid == job.c.clientid,
+    #                                         job.c.schedtime > date.today() - timedelta(days=14),
+    #                                         job.c.name == host_name))
+    # s2 = select([client.c.name,
+    #              jobhist.c.name.label('job_name'),
+    #              jobhist.c.schedtime,
+    #              jobhist.c.jobfiles,
+    #              jobhist.c.jobbytes],
+    #             use_labels=True).where(and_(client.c.clientid == jobhist.c.clientid,
+    #                                         jobhist.c.schedtime > date.today() - timedelta(days=14),
+    #                                         jobhist.c.name == host_name))
+    # query = s1.union(s2).alias('job_name')
+    query = """
+    SELECT
+        client.name, job.name as job_name, job.schedtime as schedtime, job.jobfiles, job.jobbytes
+    FROM
+        client, job
+    WHERE
+        client.clientid = job.clientid AND job.schedtime > NOW() - INTERVAL '14 days' AND job.name = '{}'
+    UNION SELECT
+        client.name, jh.name as job_name, jh.schedtime as schedtime, jh.jobfiles, jh.jobbytes
+    FROM
+        client, jobhisto as jh
+    WHERE
+        client.clientid = jh.clientid AND jh.schedtime > NOW() - INTERVAL '14 days' AND jh.name = '{}'
+    ORDER BY schedtime
+    """.format(host_name, host_name)
     result = db.execute(query).fetchall()
     b_s_res = []
     b_c_res = []
@@ -241,12 +261,11 @@ def client_detailed_info(host_name, bdate):
         b_s_res.append((k, y, i))
         b_c_res.append((k, y, z))
     b_s_result = b_c_result = []
-    b_s_result = pwb.gen_chart_array_time_3d(b_s_res)
-    b_c_result = pwb.gen_chart_array_time_3d(b_c_res)
+    b_s_result = pwb.gen_graph_json(["Client name", "Scheduled time", "Job size"], b_s_res, "Bacula backup sizes for last 14 days")
+    b_c_result = pwb.gen_graph_json(["Client name", "Scheduled time", "Files in job"], b_c_res, "Bacula backup files count for last 14 days")
     return render_template("client.html",
                            title='Detailed information for ' + host_name,
                            short_info=short_res,
-                           query=s,
                            size_result=b_s_result,
                            fcount_result=b_c_result)
 
@@ -362,20 +381,38 @@ def old_volumes():
 
 @reports.route('/reports/backup_duration/<bddate>', methods=['GET', 'POST'])
 def backup_duration(bddate):
-    s = select([pool.c.name,
-                func.min(job.c.starttime),
-                func.max(job.c.endtime)],
-               use_labels=True).where(and_(job.c.poolid == pool.c.poolid,
-                                           cast(job.c.schedtime, Date) <= datetime.fromtimestamp(float(bddate)),
-                                           cast(job.c.schedtime, Date) >= datetime.fromtimestamp(float(bddate)) - timedelta(days=1))).group_by(pool.c.name, job.c.schedtime)
-    bd = db.execute(s).fetchall()
+    # s = select([pool.c.name,
+    #             func.min(job.c.starttime),
+    #             func.max(job.c.endtime)],
+    #            use_labels=True).where(and_(job.c.poolid == pool.c.poolid,
+    #                                        cast(job.c.schedtime, Date) <= datetime.fromtimestamp(float(bddate)),
+    #                                        cast(job.c.schedtime, Date) >= datetime.fromtimestamp(float(bddate)) - timedelta(days=1))).group_by(pool.c.name, job.c.schedtime)
+    query = """
+    SELECT
+        pool.name, min(job.starttime), max(job.endtime)
+    FROM
+        pool, job
+    WHERE
+        job.poolid = pool.poolid AND job.schedtime <= to_timestamp({}) AND job.schedtime >= to_timestamp({}) - INTERVAL '1 days'
+    GROUP BY
+        pool.name, job.schedtime
+    """.format(bddate, bddate)
+    bd = db.execute(query).fetchall()
     bd_result = {}
     for bpool in bd:
         bd_result.update({bpool[0]: {'start': bpool[1], 'end': bpool[2]}})
-    s = select([func.min(job.c.starttime),
-                func.max(job.c.endtime)],
-               use_labels=True).where(job.c.poolid == pool.c.poolid)
-    _min_date, _max_date = db.execute(s).fetchone()
+    # s = select([func.min(job.c.starttime),
+    #             func.max(job.c.endtime)],
+    #            use_labels=True).where(job.c.poolid == pool.c.poolid)
+    query = """
+    SELECT
+        min(job.starttime), max(job.endtime)
+    FROM
+        job, pool
+    WHERE
+        job.poolid = pool.poolid
+    """
+    _min_date, _max_date = db.execute(query).fetchone()
     min_date = int(mktime((strptime(str(_min_date), "%Y-%m-%d %H:%M:%S"))))
     max_date = int(mktime((strptime(str(_max_date), "%Y-%m-%d %H:%M:%S"))))
     return render_template('backup_duration.html',
@@ -477,3 +514,7 @@ def media_report(media):
     return render_template('media_report.html',
                            title="Detailed information about volume " + media,
                            mir=media_info_result)
+
+@reports.context_processor
+def inject_app_info():
+    return static_vars.app_info

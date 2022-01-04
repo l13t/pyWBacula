@@ -4,6 +4,11 @@ from app.views import statics
 import chartkick
 import config
 
+import pandas as pd
+import json
+import plotly
+import plotly.express as px
+
 webapp = Flask(__name__)
 webapp.config.from_object('config')
 

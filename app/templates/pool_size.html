@@ -1,5 +1,9 @@
 {%- include 'header.html' %}
 <div class="ui vertical footer segment">
-{% line_chart s_size with library={ "xAxis":{"title":{"text":"Date period"}}, "yAxis":{"title":{"text":"Pool size in Bytes"}}, "title": {"text": "Bacula pools size history"} } %}
+    <div id='pools_size' class='chart'”></div>
+    <script type='text/javascript'>
+      var graphs = {{ s_size | safe }};
+      Plotly.plot('pools_size',graphs,{});
+    </script>
 </div>
 {%- include 'footer.html' %}

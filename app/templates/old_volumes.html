@@ -18,7 +18,7 @@ $( document ).ready(function() {
 <div class="ui vertical footer segment">
   <h2>Volume usage report</h2>
   <div class="row">
-    <div class="ui pointing secondary menu" style="overflow-y:auto;white-space:wrap;">
+    <div class="ui tabular menu" style="overflow-y:auto;white-space:wrap;">
       {% set flag = True %}
       {% set flag_time = [] %}
       {% for vol, vol_data in vol_list.items() %}

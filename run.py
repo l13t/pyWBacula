@@ -1,12 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-__credits__ = ["Dmytro Prokhorenkov"]
-__version__ = "0.1"
-__maintainer__ = "Dmytro Prokhorenkov"
-__email__ = "liet@liet.kiev.ua"
-__status__ = "Development"
-
 from app import webapp
 from flask_debug import Debug
 import os

@@ -15,3 +15,7 @@ werkzeug
 wheel
 flask_debug
 gviz_api
+pandas
+plotly
+py-healthcheck
+

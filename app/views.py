@@ -5,7 +5,8 @@ from sqlalchemy.sql import and_, select, func
 from time import gmtime, strptime, mktime
 from libs import pwb, static_vars
 from app.db import db
-from bokeh.plotting import figure, output_file, show, curdoc
+from healthcheck import HealthCheck, EnvironmentDump
+
 import config
 import gviz_api
 import os
@@ -15,10 +16,18 @@ statics = Blueprint('statics', __name__)
 
 custom_path = config.CUSTOM_PATH
 
+health = HealthCheck()
+envdump = EnvironmentDump()
+
+health.add_check(pwb.db_available)
+envdump.add_section("application", pwb.application_data)
+
+statics.add_url_rule("/health", "healthcheck", view_func=lambda: health.run())
+statics.add_url_rule("/env", "environment", view_func=lambda: envdump.run())
+
 @statics.route('/favicon.ico')
 def favicon():
     return send_from_directory(os.path.join(statics.root_path, 'static/img'), 'bacula.png', mimetype='image/png')
-
 
 @statics.route('/', methods=['GET'])
 @statics.route('/home', methods=['GET', 'POST'])
@@ -47,7 +56,8 @@ def index():
         FROM
             client, jobhisto
         WHERE
-            client.clientid = jobhisto.clientid AND jobhisto.schedtime > now() - interval '28 days';
+            client.clientid = jobhisto.clientid AND jobhisto.schedtime > now() - interval '28 days'
+    ORDER BY job_schedtime;
     """
     result = db.execute(query).fetchall()
     b_s_res = []
@@ -64,27 +74,20 @@ def index():
                                              'files': int(z),
                                              'size': pwb.sizeof_fmt(int(i)),
                                              'status': static_vars.JobStatus[st]})
-    b_s_result = pwb.gen_chart_array_time_3d(b_s_res)
-    b_c_result = pwb.gen_chart_array_time_3d(b_c_res)
 
-    b_s_result_plot = figure(name="b_s_result")
-    for item in b_s_result:
-        y, x = zip(*item['data'].items())
-        b_s_result_plot.line(x, y, legend_label=item['name'])
-    curdoc().add_root(b_s_result_plot)
+    bsresultJSON = pwb.gen_graph_json(["Client name", "Scheduled time", "Job size"], b_s_res, "Bacula backup sizes")
+    bcresultJSON = pwb.gen_graph_json(["Client name", "Scheduled time", "Files in job"], b_c_res, "Bacula backup files count")
 
     return render_template("index.html",
                            title='Home page',
-                           b_size=b_s_result,
-                           b_count=b_c_result,
+                           b_size=bsresultJSON,
+                           b_count=bcresultJSON,
                            last_backup=detailed_result_last_day,
                            tmp=result)
-
 
 @statics.errorhandler(404)
 def page_not_found(e):
     return render_template('404.html', title="Page not found"), 404
-
 
 @statics.route('/about', methods=['GET'])
 def about_page():
@@ -93,3 +96,7 @@ def about_page():
 @statics.route('/health', methods=['GET'])
 def pwb_health():
     return render_template("ok_mon_server.html", title="Home page")
+
+@statics.context_processor
+def inject_app_info():
+    return static_vars.app_info
