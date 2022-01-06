@@ -38,7 +38,7 @@ JobStatus = {
     'a': '<div class="ui yellow label">SD despooling attributes</div>',
     'l': '<div class="ui yellow label">Doing data despooling</div>',
     'L': '<div class="ui yellow label">Committing data (last despool)</div>',
-  }
+}
 
 JobLevel = {
     'F': '<div class="ui blue label">Full</div>',

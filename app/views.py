@@ -25,9 +25,11 @@ envdump.add_section("application", pwb.application_data)
 statics.add_url_rule("/health", "healthcheck", view_func=lambda: health.run())
 statics.add_url_rule("/env", "environment", view_func=lambda: envdump.run())
 
+
 @statics.route('/favicon.ico')
 def favicon():
     return send_from_directory(os.path.join(statics.root_path, 'static/img'), 'bacula.png', mimetype='image/png')
+
 
 @statics.route('/', methods=['GET'])
 @statics.route('/home', methods=['GET', 'POST'])
@@ -85,17 +87,21 @@ def index():
                            last_backup=detailed_result_last_day,
                            tmp=result)
 
+
 @statics.errorhandler(404)
 def page_not_found(e):
     return render_template('404.html', title="Page not found"), 404
+
 
 @statics.route('/about', methods=['GET'])
 def about_page():
     return render_template('about.html', title="About page")
 
+
 @statics.route('/health', methods=['GET'])
 def pwb_health():
     return render_template("ok_mon_server.html", title="Home page")
+
 
 @statics.context_processor
 def inject_app_info():

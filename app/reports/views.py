@@ -17,6 +17,7 @@ reports = Blueprint('reports', __name__)
 
 custom_path = config.CUSTOM_PATH
 
+
 @reports.route('/reports', methods=['GET'])
 def show_reports():
     unix_today = int(mktime(gmtime()))
@@ -76,7 +77,7 @@ def big_files_report():
     # _max_size = 10
     # if request.method == 'POST':
     #     _max_size = int(request.form['_max_size'])
-    #s = select([job.c.name, job.c.schedtime]).where(job.c.schedtime > datetime.now() - timedelta(hours=24))
+    # s = select([job.c.name, job.c.schedtime]).where(job.c.schedtime > datetime.now() - timedelta(hours=24))
     query = """
     SELECT
         name, schedtime
@@ -514,6 +515,7 @@ def media_report(media):
     return render_template('media_report.html',
                            title="Detailed information about volume " + media,
                            mir=media_info_result)
+
 
 @reports.context_processor
 def inject_app_info():

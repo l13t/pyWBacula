@@ -7,20 +7,23 @@ import plotly
 import plotly.express as px
 import libs.static_vars as static_vars
 
+
 def application_data():
     return static_vars.app_info
+
 
 def db_available():
     try:
         db.execute('select 1')
         return True, "DB works"
-    except:
-        return False, "DB problems"
+    except  Exception as e:
+        return False, "DB problems: " + e
     # try:
     #     db.session.query("1").from_statement("SELECT 1").all()
     #     return True, "DB works"
     # except:
     #     return False, "DB problems"
+
 
 def gen_chart_array_time_3d(in_data):
     tmp_result = {}
@@ -37,6 +40,7 @@ def gen_chart_array_time_3d(in_data):
         last_result.append(temp)
     return last_result
 
+
 def gen_plotly(in_data):
     client_data = []
     date_data = []
@@ -47,12 +51,14 @@ def gen_plotly(in_data):
         real_data.append(z)
     return [client_data, date_data, real_data]
 
+
 def gen_graph_json(ids, input_data, graph_name):
     graph_dict = dict(zip(ids, gen_plotly(input_data)))
     plot_dict = pd.DataFrame(graph_dict)
     figure_dict = px.line(plot_dict, x=ids[1], y=ids[2], color=ids[0], title=graph_name, markers=True)
     outJSON = json.dumps(figure_dict, cls=plotly.utils.PlotlyJSONEncoder)
     return outJSON
+
 
 def base64_decode_lstat(record, position):
     b64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"

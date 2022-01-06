@@ -8,6 +8,7 @@ import os
 if __name__ == '__main__':
     DEBUG = bool(os.getenv("PWB_DEBUG", default="False"))
     PORT = os.getenv("PWB_PORT", default="15995")
+    HOST = os.getenv("PWB_HOST", default="127.0.0.1")
     Debug(webapp)
     webapp.config['FLASK_DEBUG_DISABLE_STRICT'] = True
-    webapp.run(host='0.0.0.0', port=PORT, debug=DEBUG, use_debugger=DEBUG, use_reloader=DEBUG)
+    webapp.run(host=HOST, port=PORT, debug=DEBUG, use_debugger=DEBUG, use_reloader=DEBUG)
