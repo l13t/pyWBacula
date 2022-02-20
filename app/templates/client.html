@@ -2,15 +2,29 @@
 {%- include 'tables.html' %}
 <div class="ui vertical footer segment">
 <script src="/static/dist/components/tab.js"></script>
-<script src="/static/sinon.js"></script>
 
 <div class="ui two column stackable grid">
   <div class="row">
-    <div class="four wide column">
-      {% line_chart size_result with library={ "xAxis":{"title":{"text":"Date period"}}, "yAxis":{"title":{"text":"Backup size in Bytes"}}, "title": {"text": "Bacula backup sizes for last 14 days"} } %}
-      {% line_chart fcount_result with library={ "xAxis":{"title":{"text":"Date period"}}, "yAxis":{"title":{"text":"Files count in backup"}}, "title": {"text": "Bacula backup files count for last 14 days"}} %}
+    <div class="column">
+      <h2>{{ title }}</h2>
     </div>
-    <div class="twelve wide column">
+  </div>
+</div>
+<div class="ui two column stackable grid">
+  <div class="row">
+    <div class="six wide column">
+      <div id='size_chart' class='chart'”></div>
+      <script type='text/javascript'>
+        var graphs = {{ size_result | safe }};
+        Plotly.plot('size_chart',graphs,{});
+      </script>
+      <div id='count_chart' class='chart'”></div>
+      <script type='text/javascript'>
+        var graphs = {{ fcount_result | safe }};
+        Plotly.plot('count_chart',graphs,{});
+      </script>
+    </div>
+    <div class="eight wide column">
       <div class="ui pointing secondary demo menu">
             {% set flag = True %}
             {% set flag_time = [] %}

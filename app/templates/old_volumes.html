@@ -1,13 +1,12 @@
 {%- include 'header.html' %}
 {%- include 'tables.html' %}
 
-<script src="/static/dist/components/tab.js"></script>
-<script src="/static/sinon.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/components/tab.js"></script>
 <script type="text/javascript">// <![CDATA[
 $( document ).ready(function() {
 
         // initialize both popups inline
-        $('.menu .item').tab({ history: false });
+        $('.top.menu .item').tab({ history: false });
 
             });
 // ]]>
@@ -18,15 +17,17 @@ $( document ).ready(function() {
 <div class="ui vertical footer segment">
   <h2>Volume usage report</h2>
   <div class="row">
-    <div class="ui pointing secondary menu" style="overflow-y:auto;white-space:wrap;">
-      {% set flag = True %}
-      {% set flag_time = [] %}
+    <div class="ui attached tabular menu top" style="overflow-y:auto;white-space:wrap;">
+      {% set vol_keys = vol_list.keys() | list %}
+      {% set active_tab = vol_keys[0] %}
+      {% set active_flag = True %}
       {% for vol, vol_data in vol_list.items() %}
-      <a class="item{% if flag %}{% do flag_time.append(vol) %} active{% set flag = False %}{% endif %}" data-tab="{{ vol}}">{{ vol }}</a>
+      <a class="item{% if active_tab == vol %} active{% endif %}" data-tab="{{ vol }}">{{ vol }}</a>
       {% endfor %}
     </div>
-      {% for vol, vol_data in vol_list.items() %}
-    <div class="ui{% if vol in flag_time %} active{% endif %} tab segment" data-tab="{{ vol }}">
+    {% set active_flag = True %}
+    {% for vol, vol_data in vol_list.items() %}
+    <div class="ui{% if active_tab == vol %} active{% endif %} tab segment" data-tab="{{ vol }}">
       <h2>
       </h2>
       <table class="ui fixed very basic collapsing celled table"
