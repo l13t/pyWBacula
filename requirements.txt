@@ -13,4 +13,4 @@ pygal==2.4.0
 psycopg2==2.7.3
 SQLAlchemy
 requests
-wheel==0.29.0
+wheel==0.38.0
