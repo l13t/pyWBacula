@@ -1,7 +1,5 @@
 from datetime import datetime, date, timedelta
 from flask import Blueprint, render_template, request, redirect, send_from_directory
-from sqlalchemy import cast, Date
-from sqlalchemy.sql import and_, select, func
 from time import gmtime, strptime, mktime
 from libs import pwb, static_vars
 from app.db import db
@@ -24,7 +22,7 @@ def show_reports():
     return render_template('reports.html', title='Available reports list', unix_date=unix_today)
 
 
-@reports.route('/reports/jobs', methods=['POST'])
+@reports.route('/reports/jobs', methods=['GET', 'POST'])
 def jobs_report():
     s = """
     SELECT
@@ -108,7 +106,7 @@ def big_files_report():
             filename.filenameid = file.filenameid AND job.schedtime > NOW() - INTERVAL '24 hours'
         """.format(job_i)
         out_res = db.execute(query)
-        proceed_result[job_i] = pwb.show_decoded_big_files_results(out_res, 10)
+        proceed_result[job_i] = pwb.show_decoded_big_files_results(out_res, 1)
         sched_time[job_i] = res[1].strftime("%Y-%m-%d %H:%M:%S")
     return render_template('bigfiles_report.html',
                            title='Big files report',
@@ -117,7 +115,7 @@ def big_files_report():
                            sched_time=sched_time)
 
 
-@reports.route('/reports/pool_size_report', methods=['POST'])
+@reports.route('/reports/pool_size_report', methods=['GET', 'POST'])
 def pool_size_report():
     s = """
     SELECT
@@ -174,7 +172,7 @@ def client_detailed_info(host_name, bdate):
     FROM
         job, client
     WHERE
-        client.clientid = job.clientid AND job.name = '{}' AND job.schedtime = '{}'
+        client.clientid = job.clientid AND job.name = '{}' AND date_trunc('second', job.schedtime) = '{}'
     """.format(host_name, bdate)
     _short_res = db.execute(query).fetchall()
     short_res = []
@@ -202,7 +200,7 @@ def client_detailed_info(host_name, bdate):
         FROM
             path, filename, file, job
         WHERE
-            job.name = '{}' AND job.jobid = file.jobid AND job.schedtime = '{}' AND filename.filenameid = file.filenameid AND path.pathid = file.pathid
+            job.name = '{}' AND job.jobid = file.jobid AND date_trunc('second', job.schedtime) = '{}' AND filename.filenameid = file.filenameid AND path.pathid = file.pathid
         """.format(host_name, bdate)
         f_res = db.execute(f_sel).fetchall()
         backup_files_list = []
@@ -271,7 +269,7 @@ def client_detailed_info(host_name, bdate):
                            fcount_result=b_c_result)
 
 
-@reports.route('/reports/long_running_backup', methods=['POST'])
+@reports.route('/reports/long_running_backup', methods=['GET', 'POST'])
 def long_running_backups():
     # s = select([client.c.name,
     #             job.c.name,
@@ -414,8 +412,8 @@ def backup_duration(bddate):
         job.poolid = pool.poolid
     """
     _min_date, _max_date = db.execute(query).fetchone()
-    min_date = int(mktime((strptime(str(_min_date), "%Y-%m-%d %H:%M:%S"))))
-    max_date = int(mktime((strptime(str(_max_date), "%Y-%m-%d %H:%M:%S"))))
+    min_date = int(_min_date.timestamp())
+    max_date = int(_max_date.timestamp())
     return render_template('backup_duration.html',
                            title="Backup duration time",
                            bd_result=bd_result,
@@ -429,8 +427,8 @@ def show_file(fname):
     if fname == 'index':
         return redirect("/", code=302)
     else:
-        fi = open(custom_path + fname + ".html", 'r')
-        text = fi.read()
+        with open(custom_path + fname + ".html", 'r') as fi:
+            text = fi.read()
         title = re.compile('<title>(.*?)</title>', re.DOTALL | re.IGNORECASE).findall(text)
         text = re.sub("<head>.*?</head>", "", text, flags=re.DOTALL)
         text = re.sub("<(html|body)>", "", text, flags=re.DOTALL)

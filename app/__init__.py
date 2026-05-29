@@ -1,7 +1,7 @@
-from flask import Flask, Blueprint
+from flask import Flask
 from app.reports.views import reports
 from app.views import statics
-import chartkick
+from chartkick.flask import chartkick_blueprint
 import config
 
 import pandas as pd
@@ -12,10 +12,7 @@ import plotly.express as px
 webapp = Flask(__name__)
 webapp.config.from_object('config')
 
-ck = Blueprint('ck_page', __name__, static_folder=chartkick.js(), static_url_path='/static')
-
-webapp.register_blueprint(ck, url_prefix='/ck')
-webapp.jinja_env.add_extension("chartkick.ext.charts")
+webapp.register_blueprint(chartkick_blueprint, url_prefix='/ck')
 webapp.jinja_env.add_extension('jinja2.ext.do')
 
 # Adding routes

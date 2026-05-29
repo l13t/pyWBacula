@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+from scripts.fetch_assets import fetch_if_missing
+fetch_if_missing()
+
 from app import webapp
 from flask_debug import Debug
 import os

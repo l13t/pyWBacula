@@ -142,3 +142,8 @@ cython_debug/
 ### Project specific
 .vscode
 config.py
+
+# Frontend assets fetched at build time (see scripts/fetch_assets.sh)
+app/static/tablesort.js
+app/static/sorts/
+app/static/jquery.address.js

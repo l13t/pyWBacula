@@ -1,63 +1,142 @@
 {%- include 'header.html' %}
 {%- include 'tables.html' %}
 
-<script src="/static/dist/components/form.js"></script>
+<script type="text/javascript">// <![CDATA[
+$( document ).ready(function() {
+    $('.top.menu .item').tab({ history: false });
+});
+// ]]>
+</script>
 
-<div class="ui vertical stripe segment">
-  <!--<form class="ui form segment">
-    <div class="one fields">
-      <div class="field">
-        <label>Maximum file size (specified in KiB)</label>
-        <div class="ui selection dropdown" tabindex="0">
-          <input name="_max_size" type="hidden">
-          <i class="dropdown icon">
-          </i>
-          <div class="menu transition hidden" tabindex="-1">
-            <div class="item active" data-value="10">10 MiB</div>
-            <div class="item" data-value="100">100 MiB</div>
-            <div class="item" data-value="1024">1 GiB</div>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="ui blue submit button">
-      Use this files size
-    </div>
-  </form>-->
-  {% for job_name, job_data in bf_report.items() %}
-    {% if job_data != [] %}
-  <div class="ui middle aligned stackable grid container">
-    <div class="row">
-      <div class="column">
-        <h2><a href="/reports/client/{{ job_name }}/{{ sched_time[job_name] }}">{{ job_name }}</a> has big files in last backup</h2>
-        <table class="ui fixed left aligned celled table sort" id="bigfiles-{{ job_name }}-{{ sched_time[job_name] }}">
-          <thead>
-            <tr>
-              <th>Filename</th>
-              <th width=150px>Owner (uid:gid)</th>
-              <th width=150px>Size in MBytes</th>
-              <th width=150px>Last modified time</th>
-            </tr>
-          </thead>
-          <tbody>
-      {% for job in job_data %}
-            <tr>
-              <td class="left aligned">{{ job['fname'] }}</td>
-              <td class="left aligned">{{ job['uid'] }}:{{ job['gid'] }}</td>
-              <td class="right aligned">{{ job['size'] }}</td>
-              <td class="left aligned">{{ job['mtime'] }}</td>
-            </tr>
-      {% endfor %}
-          </tbody>
-        </table>
-        <script>
-new Tablesort(document.getElementById('bigfiles-{{ job_name }}-{{ sched_time[job_name] }}'));
-        </script>
+<div id="report-content" class="ui vertical stripe segment">
+
+  {%- set servers = bf_report.keys() | list %}
+  {%- if not servers %}
+  <div class="ui info message">
+    <i class="info circle icon"></i> No files found in last 24 hours.
+  </div>
+  {%- else %}
+
+  <!-- Size filter -->
+  <div class="ui form" style="margin-bottom: 1.2em;">
+    <div style="display:flex; align-items:center; gap:1.2em; flex-wrap:wrap;">
+      <label style="font-weight:600; white-space:nowrap;">
+        Min file size: <span id="bf-size-label" style="color:#2185d0;">10 MB</span>
+      </label>
+      <input id="bf-slider" type="range" min="1" max="1000" value="10" step="1"
+             style="flex:1; min-width:180px; max-width:400px; accent-color:#2185d0;">
+      <div class="ui mini buttons">
+        <button class="ui button bf-preset" data-val="5">5 MB</button>
+        <button class="ui button bf-preset" data-val="10">10 MB</button>
+        <button class="ui button bf-preset" data-val="50">50 MB</button>
+        <button class="ui button bf-preset" data-val="100">100 MB</button>
+        <button class="ui button bf-preset" data-val="500">500 MB</button>
       </div>
     </div>
   </div>
-    {% endif %}
-  {% endfor %}
+
+  <div class="row">
+    {% set active_tab = servers[0] %}
+    <div class="ui attached tabular menu top" style="overflow-x:auto;white-space:nowrap;">
+      {% for job_name in servers %}
+      <a class="item{% if active_tab == job_name %} active{% endif %}" data-tab="{{ job_name }}">
+        {{ job_name }} <span class="ui teal circular label" id="bf-count-{{ loop.index }}">—</span>
+      </a>
+      {% endfor %}
+    </div>
+
+    {% for job_name, job_data in bf_report.items() %}
+    <div class="ui{% if active_tab == job_name %} active{% endif %} tab segment" data-tab="{{ job_name }}">
+      <h4 style="margin: 0.5em 0;">
+        <a href="/reports/client/{{ job_name }}/{{ sched_time[job_name] }}">
+          <i class="external alternate icon"></i> {{ job_name }}
+        </a>
+        <span class="ui grey text" style="font-size:.85em; margin-left:.5em;">
+          — last backup {{ sched_time[job_name] }}
+        </span>
+      </h4>
+
+      {%- if job_data %}
+      <div class="ui warning message" id="bf-empty-{{ loop.index }}" style="display:none;">
+        <i class="filter icon"></i> No files above threshold in this backup.
+      </div>
+      <div style="overflow-x:auto;">
+        <table class="ui compact striped celled table"
+               id="bf-table-{{ loop.index }}" style="width:auto;min-width:500px;">
+          <thead>
+            <tr>
+              <th>Path</th>
+              <th width="120">Owner (uid:gid)</th>
+              <th width="120" class="right aligned">Size</th>
+              <th width="160">Modified</th>
+            </tr>
+          </thead>
+          <tbody>
+            {%- for f in job_data %}
+            <tr data-size="{{ f['real_size'] }}">
+              <td>{{ f['fname'] }}</td>
+              <td>{{ f['uid'] }}:{{ f['gid'] }}</td>
+              <td class="right aligned">{{ f['size'] }}</td>
+              <td>{{ f['mtime'] }}</td>
+            </tr>
+            {%- endfor %}
+          </tbody>
+        </table>
+      </div>
+      {%- else %}
+      <div class="ui info message">
+        <i class="info circle icon"></i> No files ≥ 1 MB in last backup.
+      </div>
+      {%- endif %}
+    </div>
+    {% endfor %}
+  </div>
+
+  <script>
+  (function () {
+    var numTabs = {{ servers | length }};
+
+    function applyFilter() {
+      var minMB = parseInt(document.getElementById('bf-slider').value, 10);
+      var minBytes = minMB * 1024 * 1024;
+      document.getElementById('bf-size-label').textContent = minMB + ' MB';
+
+      for (var i = 1; i <= numTabs; i++) {
+        var table = document.getElementById('bf-table-' + i);
+        if (!table) continue;
+        var rows = table.querySelectorAll('tbody tr');
+        var visible = 0;
+        rows.forEach(function (row) {
+          var sz = parseInt(row.dataset.size, 10);
+          if (sz >= minBytes) { row.style.display = ''; visible++; }
+          else                 { row.style.display = 'none'; }
+        });
+        var badge = document.getElementById('bf-count-' + i);
+        if (badge) badge.textContent = visible;
+        var emptyMsg = document.getElementById('bf-empty-' + i);
+        if (emptyMsg) {
+          emptyMsg.style.display = (visible === 0 && rows.length > 0) ? '' : 'none';
+        }
+      }
+
+      document.querySelectorAll('.bf-preset').forEach(function (btn) {
+        btn.classList.toggle('primary', parseInt(btn.dataset.val, 10) === minMB);
+      });
+    }
+
+    document.getElementById('bf-slider').addEventListener('input', applyFilter);
+
+    document.querySelectorAll('.bf-preset').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        document.getElementById('bf-slider').value = this.dataset.val;
+        applyFilter();
+      });
+    });
+
+    applyFilter();
+  }());
+  </script>
+  {%- endif %}
 </div>
 
 {%- include 'footer.html' %}

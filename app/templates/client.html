@@ -1,7 +1,13 @@
 {%- include 'header.html' %}
 {%- include 'tables.html' %}
-<div class="ui vertical footer segment">
-<script src="/static/dist/components/tab.js"></script>
+
+<script type="text/javascript">
+$( document ).ready(function() {
+    $('.secondary.menu .item[data-tab]').tab({ history: false });
+});
+</script>
+
+<div id="report-content" class="ui vertical stripe segment">
 
 <div class="ui two column stackable grid">
   <div class="row">

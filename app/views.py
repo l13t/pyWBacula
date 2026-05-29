@@ -1,14 +1,11 @@
-from datetime import datetime, date, timedelta
+from datetime import datetime, timedelta
 from flask import Blueprint, render_template, request, redirect, send_from_directory
-from sqlalchemy import cast, Date
-from sqlalchemy.sql import and_, select, func
 from time import gmtime, strptime, mktime
 from libs import pwb, static_vars
 from app.db import db
 from healthcheck import HealthCheck, EnvironmentDump
 
 import config
-import gviz_api
 import os
 import re
 
@@ -75,7 +72,8 @@ def index():
                                              'date': y.strftime('%Y-%m-%d %H:%M:%S'),
                                              'files': int(z),
                                              'size': pwb.sizeof_fmt(int(i)),
-                                             'status': static_vars.JobStatus[st]})
+                                             'status': static_vars.JobStatus[st],
+                                             'status_raw': st})
 
     bsresultJSON = pwb.gen_graph_json(["Client name", "Scheduled time", "Job size"], b_s_res, "Bacula backup sizes")
     bcresultJSON = pwb.gen_graph_json(["Client name", "Scheduled time", "Files in job"], b_c_res, "Bacula backup files count")

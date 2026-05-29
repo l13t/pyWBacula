@@ -16,8 +16,8 @@ def db_available():
     try:
         db.execute('select 1')
         return True, "DB works"
-    except  Exception as e:
-        return False, "DB problems: " + e
+    except Exception as e:
+        return False, "DB problems: " + str(e)
     # try:
     #     db.session.query("1").from_statement("SELECT 1").all()
     #     return True, "DB works"
