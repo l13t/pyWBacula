@@ -9,4 +9,4 @@ py-healthcheck
 pandas
 plotly
 SQLAlchemy>=2.0
-werkzeug
+werkzeug>=3.0.1
