@@ -1,48 +1,102 @@
 {%- include 'header.html' %}
 {%- include 'tables.html' %}
-<div class="ui vertical footer segment">
-<div class="ui two column stackable grid">
-  <div class="column">
-    <h3 class="ui center aligned header">
-      Backup sizes and files count for the last two months
-    </h3>
-{% line_chart b_size with library={ "xAxis":{"title":{"text":"Date period"}}, "yAxis":{"title":{"text":"Backup size in Bytes"}}, "title": {"text": "Bacula backup sizes"} } %}
-{% line_chart b_count with library={ "xAxis":{"title":{"text":"Date period"}}, "yAxis":{"title":{"text":"Files count in backup"}}, "title": {"text": "Bacula backup files count"}} %}
+
+{%- set total   = last_backup | length %}
+{%- set ok      = last_backup | selectattr('status_raw', 'equalto', 'T') | list | length %}
+{%- set warn    = last_backup | selectattr('status_raw', 'equalto', 'W') | list | length %}
+{%- set failed  = (last_backup | selectattr('status_raw', 'equalto', 'E') | list | length)
+                + (last_backup | selectattr('status_raw', 'equalto', 'e') | list | length)
+                + (last_backup | selectattr('status_raw', 'equalto', 'f') | list | length) %}
+{%- set running = last_backup | selectattr('status_raw', 'equalto', 'R') | list | length %}
+
+<div style="padding: 0 0.5em;">
+
+  <!-- Stat cards -->
+  <div class="ui four statistics" style="margin-bottom: 1.5em;">
+    <div class="statistic">
+      <div class="value">{{ total }}</div>
+      <div class="label">Jobs (24 h)</div>
+    </div>
+    <div class="green statistic">
+      <div class="value"><i class="check circle outline icon"></i> {{ ok }}</div>
+      <div class="label">Successful</div>
+    </div>
+    <div class="yellow statistic">
+      <div class="value"><i class="exclamation triangle icon"></i> {{ warn }}</div>
+      <div class="label">Warnings</div>
+    </div>
+    <div class="{% if failed > 0 %}red{% else %}grey{% endif %} statistic">
+      <div class="value"><i class="times circle outline icon"></i> {{ failed }}</div>
+      <div class="label">Failed</div>
+    </div>
   </div>
-  <div class="column">
-    <h3 class="ui center aligned header">
-      Backup for last 24 hours
-    </h3>
-    <table class="ui fixed sort striped left aligned table" id='cllisttoday'>
+
+  <div class="ui divider"></div>
+
+  <!-- Charts row -->
+  <div class="ui two column stackable grid" style="margin-bottom: 1em;">
+    <div class="column">
+      <div class="ui segment">
+        <h4 class="ui header"><i class="database icon"></i> Backup size (28 days)</h4>
+        <div id="size_chart"></div>
+        <script>
+          Plotly.plot('size_chart', {{ b_size | safe }}, {margin: {t:10, b:40}, height: 320});
+        </script>
+      </div>
+    </div>
+    <div class="column">
+      <div class="ui segment">
+        <h4 class="ui header"><i class="copy outline icon"></i> Files per backup (28 days)</h4>
+        <div id="count_chart"></div>
+        <script>
+          Plotly.plot('count_chart', {{ b_count | safe }}, {margin: {t:10, b:40}, height: 320});
+        </script>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent backups table -->
+  <div class="ui segment">
+    <h4 class="ui header"><i class="clock outline icon"></i> Backups — last 24 hours
+      {%- if running > 0 %}
+      <div class="ui teal horizontal label" style="margin-left:.5em;">
+        <i class="circle notch icon"></i> {{ running }} running
+      </div>
+      {%- endif %}
+    </h4>
+    {%- if last_backup %}
+    <table class="ui compact striped celled table sort" id="cllisttoday">
       <thead>
         <tr>
-          <th class="sort-header">Client name</br> (Job name)</th>
-          <th class="sort-header" width=16%>Backup date</th>
-          <th class="sort-header" width=14%>Files count</th>
-          <th class="sort-header" width=14%>Backup</br> size</th>
-          <th class="sort-header" width=16%>Status</th>
+          <th>Client</th>
+          <th>Job</th>
+          <th>Scheduled</th>
+          <th>Files</th>
+          <th>Size</th>
+          <th>Status</th>
         </tr>
       </thead>
       <tbody>
-    {% for backup in last_backup %}
+        {%- for backup in last_backup %}
         <tr>
-          <td class="left aligned">{{ backup['name'] }} (<a href="/reports/client/{{ backup['bak_name'] }}/{{ backup['date'] }}">{{ backup['bak_name'] }}</a>)</td>
+          <td>{{ backup['name'] }}</td>
+          <td><a href="/reports/client/{{ backup['bak_name'] }}/{{ backup['date'] }}">{{ backup['bak_name'] }}</a></td>
           <td>{{ backup['date'] }}</td>
-          <td>{{ backup['files'] }}</td>
-          <td>{{ backup['size'] }}</td>
-          <td>
-            {% autoescape false %}
-            {{ backup['status'] }}
-            {% endautoescape %}
-          </td>
+          <td class="right aligned">{{ backup['files'] }}</td>
+          <td class="right aligned">{{ backup['size'] }}</td>
+          <td>{% autoescape false %}{{ backup['status'] }}{% endautoescape %}</td>
         </tr>
-    {% endfor %}
+        {%- endfor %}
       </tbody>
     </table>
-    <script>
-    new Tablesort(document.getElementById('cllisttoday'));
-    </script>
+    <script>new Tablesort(document.getElementById('cllisttoday'));</script>
+    {%- else %}
+    <div class="ui info message">
+      <i class="info circle icon"></i> No backups in the last 24 hours.
+    </div>
+    {%- endif %}
   </div>
+
 </div>
-</div>
+
 {%- include 'footer.html' %}

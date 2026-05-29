@@ -1,0 +1,15 @@
+.git
+.gitignore
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+*.egg-info
+venv
+.venv
+env
+.env
+config.py
+*.md
+.github
+docker/initdb

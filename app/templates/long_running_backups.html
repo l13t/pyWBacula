@@ -1,44 +1,40 @@
 {%- include 'header.html' %}
 {%- include 'tables.html' %}
 
-<div class="ui vertical footer segment">
-<h2>
-  List of backups which runs more than 30 minutes
-</h2>
-<table class="ui fixed single line celled table sort" id="longrun">
+<div id="report-content" class="ui vertical stripe segment">
+<h4 class="ui header"><i class="clock outline icon"></i> Backups running longer than 30 minutes</h4>
+<div style="overflow-x:auto;">
+<table class="ui compact striped celled table" id="longrun" style="width:auto;min-width:600px;">
   <thead>
     <tr>
-      <th>Client name</th>
-      <th>Job name</th>
-      <th width=100px>Job ID</th>
-      <th width=100px>Job status</th>
-      <th width=100px>scheduled time</th>
-      <th width=100px>start time</th>
-      <th width=100px>end time</th>
-      <th width=100px>Job duration</th>
-      <th width=100px>Job files count</th>
-      <th width=100px>Backup size</th>
+      <th>Client</th>
+      <th>Job</th>
+      <th>Status</th>
+      <th>Scheduled</th>
+      <th>Start</th>
+      <th>End</th>
+      <th>Duration</th>
+      <th class="right aligned">Files</th>
+      <th class="right aligned">Size</th>
     </tr>
   </thead>
-{% for job in long_job %}
   <tbody>
+  {% for job in long_job %}
     <tr>
       <td>{{ job['cname'] }}</td>
       <td><a href="/reports/client/{{ job['jname'] }}/{{ job['jsched'] }}">{{ job['jname'] }}</a></td>
-      <td>{{ job['jid'] }}</td>
       <td>{% autoescape false %}{{ job['jstatus'] }}{% endautoescape %}</td>
       <td>{{ job['jsched'] }}</td>
       <td>{{ job['jstart'] }}</td>
       <td>{{ job['jend'] }}</td>
       <td>{{ job['jduration'] }}</td>
-      <td>{{ job['jfiles'] }}</td>
-      <td>{{ job['jbytes'] }}</td>
+      <td class="right aligned">{{ job['jfiles'] }}</td>
+      <td class="right aligned">{{ job['jbytes'] }}</td>
     </tr>
+  {% endfor %}
   </tbody>
-{% endfor %}
 </table>
-<script>
-new Tablesort(document.getElementById('longrun'));
-</script>
+</div>
+<script>new Tablesort(document.getElementById('longrun'));</script>
 </div>
 {%- include 'footer.html' %}

@@ -1,0 +1,31 @@
+services:
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: bacula
+      POSTGRES_USER: bacula
+      POSTGRES_PASSWORD: bacula
+    volumes:
+      - ./docker/initdb:/docker-entrypoint-initdb.d:ro
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "bacula"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  pywbacula:
+    build: .
+    ports:
+      - "15995:15995"
+    environment:
+      DB_URI: postgresql://bacula:bacula@db:5432/bacula?client_encoding=utf8
+      SECRET_KEY: dev-only-change-in-prod
+      CUSTOM_PATH: /tmp/custom_reports/
+      PWB_HOST: "0.0.0.0"
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  pgdata:

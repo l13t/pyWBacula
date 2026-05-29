@@ -1,13 +1,11 @@
 {%- include 'header.html' %}
 {%- include 'tables.html' %}
 
-<script src="/static/dist/components/tab.js"></script>
-<script src="/static/sinon.js"></script>
 <script type="text/javascript">// <![CDATA[
 $( document ).ready(function() {
 
         // initialize both popups inline
-        $('.menu .item').tab({ history: false });
+        $('.top.menu .item').tab({ history: false });
 
             });
 // ]]>
@@ -15,18 +13,20 @@ $( document ).ready(function() {
 
 </script>
 
-<div class="ui vertical footer segment">
+<div id="report-content" class="ui vertical stripe segment">
   <h2>Volume usage report</h2>
   <div class="row">
-    <div class="ui pointing secondary menu" style="overflow-y:auto;white-space:wrap;">
-      {% set flag = True %}
-      {% set flag_time = [] %}
+    <div class="ui attached tabular menu top" style="overflow-y:auto;white-space:wrap;">
+      {% set vol_keys = vol_list.keys() | list %}
+      {% set active_tab = vol_keys[0] %}
+      {% set active_flag = True %}
       {% for vol, vol_data in vol_list.items() %}
-      <a class="item{% if flag %}{% do flag_time.append(vol) %} active{% set flag = False %}{% endif %}" data-tab="{{ vol}}">{{ vol }}</a>
+      <a class="item{% if active_tab == vol %} active{% endif %}" data-tab="{{ vol }}">{{ vol }}</a>
       {% endfor %}
     </div>
-      {% for vol, vol_data in vol_list.items() %}
-    <div class="ui{% if vol in flag_time %} active{% endif %} tab segment" data-tab="{{ vol }}">
+    {% set active_flag = True %}
+    {% for vol, vol_data in vol_list.items() %}
+    <div class="ui{% if active_tab == vol %} active{% endif %} tab segment" data-tab="{{ vol }}">
       <h2>
       </h2>
       <table class="ui fixed very basic collapsing celled table"
@@ -57,7 +57,8 @@ $( document ).ready(function() {
           </tr>
         </tbody>
       </table>
-      <table class="ui fixed celled striped table sort" id="oldvolumes-{{ vol }}">
+      <div style="overflow-x:auto;">
+      <table class="ui celled striped table sort" id="oldvolumes-{{ vol }}" style="width:auto;min-width:500px;">
         <thead>
           <tr>
             <th class="sort-header">Volume name</th>
@@ -79,6 +80,7 @@ $( document ).ready(function() {
         {% endfor %}
         </tbody>
       </table>
+      </div>
       <script>
 new Tablesort(document.getElementById('oldvolumes-{{ vol }}'));
       </script>

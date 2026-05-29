@@ -1,46 +1,130 @@
 {%- include 'header.html' %}
+{%- include 'tables.html' %}
 
-<div class="ui vertical stripe segment">
-  <div class="ui middle aligned stackable grid container">
-    <div class="row">
-      <div class="eight wide column">
-        <form method="post" action="/reports/jobs">
-          <input type="hidden" name="" value="">
-          <input type="submit" class="ui button" value="Show jobs report">
-        </form>
-      </div>
-      <div class="eight wide column">
-        <form method="post" action="/reports/big_files">
-          <input type="hidden" name="_max_size" value="10">
-          <input type="submit" class="ui button" value="Show big files report">
-        </form>
-      </div>
-    </div>
-    <div class="row">
-      <div class="eight wide column">
-        <form method="post" action="/reports/pool_size_report">
-          <input type="hidden" name="" value="">
-          <input type="submit" class="ui button" value="Show pools size report">
-        </form>
-      </div>
-      <div class="eight wide column">
-        <form method="post" action="/reports/long_running_backup">
-          <input type="hidden" name="" value="">
-          <input type="submit" class="ui button" value="Show long-running backups">
-        </form>
-      </div>
-    </div>
-    <div class="row">
-      <div class="eight wide column">
-        <a href="/reports/old_volumes" class="ui button">Show volumes usage</a>
-      </div>
-      <div class="eight wide column">
-        <form method="post" action="/reports/backup_duration/{{ unix_date }}">
-          <input type="submit" class="ui button" value="Show backup duration time">
-        </form>
+<div style="margin-top: 1em; margin-bottom: 3em;">
+  <div class="ui grid">
+
+    <!-- Sidebar -->
+    <div class="three wide column">
+      <div class="ui fluid vertical pointing menu" id="report-menu">
+        <a class="item active"
+           data-url="/reports/jobs"
+           title="Latest status per job name">
+          <i class="tasks icon"></i> Jobs
+        </a>
+        <a class="item"
+           data-url="/reports/big_files"
+           title="Files larger than 10 MB in last backup">
+          <i class="hdd icon"></i> Big Files
+        </a>
+        <a class="item"
+           data-url="/reports/pool_size_report"
+           title="Backup size per pool over last 28 days">
+          <i class="chart bar outline icon"></i> Pool Size
+        </a>
+        <a class="item"
+           data-url="/reports/long_running_backup"
+           title="Jobs running longer than 30 minutes">
+          <i class="clock outline icon"></i> Long Running
+        </a>
+        <a class="item"
+           data-url="/reports/old_volumes"
+           title="Tape/disk volume status and usage">
+          <i class="archive icon"></i> Volumes
+        </a>
+        <a class="item"
+           data-url="/reports/backup_duration/{{ unix_date }}"
+           title="Backup start/end time chart">
+          <i class="calendar alternate outline icon"></i> Duration
+        </a>
       </div>
     </div>
+
+    <!-- Content panel -->
+    <div class="thirteen wide column" id="report-panel">
+    </div>
+
   </div>
 </div>
+
+<script>
+(function () {
+  var panel = document.getElementById('report-panel');
+  var items = document.querySelectorAll('#report-menu .item');
+
+  function showLoader() {
+    var seg = document.createElement('div');
+    seg.className = 'ui segment';
+    seg.style.cssText = 'min-height:200px;text-align:center;padding:4em;';
+    var loader = document.createElement('div');
+    loader.className = 'ui active inline loader';
+    seg.appendChild(loader);
+    panel.replaceChildren(seg);
+  }
+
+  function showError(msg) {
+    var div = document.createElement('div');
+    div.className = 'ui error message';
+    var icon = document.createElement('i');
+    icon.className = 'warning icon';
+    div.appendChild(icon);
+    div.appendChild(document.createTextNode(' ' + msg));
+    panel.replaceChildren(div);
+  }
+
+  function interceptPanelLinks(container) {
+    container.querySelectorAll('a[href^="/reports/"]').forEach(function (link) {
+      link.addEventListener('click', function (e) {
+        e.preventDefault();
+        loadReport(this.getAttribute('href'));
+      });
+    });
+  }
+
+  function execScripts(el) {
+    el.querySelectorAll('script').forEach(function (old) {
+      var s = document.createElement('script');
+      s.textContent = old.textContent;
+      old.parentNode.replaceChild(s, old);
+    });
+  }
+
+  function loadReport(url) {
+    showLoader();
+    fetch(url)
+      .then(function (r) {
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        return r.text();
+      })
+      .then(function (html) {
+        var doc = new DOMParser().parseFromString(html, 'text/html');
+        var content = doc.getElementById('report-content');
+        if (content) {
+          var adopted = document.adoptNode(content);
+          panel.replaceChildren(adopted);
+          execScripts(panel);
+          $(panel).find('.tabular.menu .item[data-tab]').tab({ history: false });
+          interceptPanelLinks(panel);
+        } else {
+          showError('Could not load report content.');
+        }
+      })
+      .catch(function (err) {
+        showError(err.toString());
+      });
+  }
+
+  items.forEach(function (item) {
+    item.addEventListener('click', function () {
+      items.forEach(function (i) { i.classList.remove('active'); });
+      this.classList.add('active');
+      loadReport(this.dataset.url);
+    });
+  });
+
+  var active = document.querySelector('#report-menu .item.active');
+  if (active) loadReport(active.dataset.url);
+}());
+</script>
 
 {%- include 'footer.html' %}

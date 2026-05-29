@@ -1,12 +1,12 @@
 {%- include 'header.html' %}
 {%- include 'tables.html' %}
 
-<div class="ui vertical stripe segment">
+<div id="report-content" class="ui vertical stripe segment">
   <div class="ui middle aligned stackable grid container">
     <div class="row">
       <div class="six wide column">
         {% if bddate >= min_date %}
-        <a class="ui button" href="/reports/backup_duration/{{ bddate - 86400 }}">Previous day</a>
+        <a class="ui button" href="/reports/backup_duration/{{ bddate - 86400 }}">Previous Day</a>
         {% endif %}
       </div>
       <div class="six wide column right aligned">

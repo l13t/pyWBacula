@@ -1,2 +1,5 @@
 CSRF_ENABLED = True
 SECRET_KEY = '<some_strong_key>'
+DB_URI = 'postgresql://<URI_TO_YOUR_DATABASE>?client_encoding=utf8'
+SQLALCHEMY_TRACK_MODIFICATIONS = True
+CUSTOM_PATH='<some_path>'

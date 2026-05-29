@@ -1,25 +1,20 @@
-from flask import Flask, Blueprint
+from flask import Flask
+from app.reports.views import reports
+from app.views import statics
+from chartkick.flask import chartkick_blueprint
+import config
 
-app = Flask(__name__)
-app.config.from_object('config')
-
-from flask.ext.bower import Bower
-import pygal
+import pandas as pd
 import json
-from urllib2 import urlopen
-from pygal.style import DarkSolarizedStyle
-#from flask.ext.sqlalchemy import SQLAlchemy
-from sqlalchemy import Table, Column, Integer, String, MetaData, ForeignKey, create_engine
+import plotly
+import plotly.express as px
 
-from app import config
-db = create_engine(config.DB_URI, echo=True)
+webapp = Flask(__name__)
+webapp.config.from_object('config')
 
-custom_path = config.CUSTOM_PATH
+webapp.register_blueprint(chartkick_blueprint, url_prefix='/ck')
+webapp.jinja_env.add_extension('jinja2.ext.do')
 
-from app import views
-import chartkick
-
-ck = Blueprint('ck_page', __name__, static_folder=chartkick.js(), static_url_path='/static')
-app.register_blueprint(ck, url_prefix='/ck')
-app.jinja_env.add_extension("chartkick.ext.charts")
-app.jinja_env.add_extension('jinja2.ext.do')
+# Adding routes
+webapp.register_blueprint(statics)
+webapp.register_blueprint(reports)
