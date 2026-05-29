@@ -1,99 +1,73 @@
 # pyWBacula
 
-Another one simple bacula web reports interface.
+Web reports interface for [Bacula](https://www.bacula.org/) backup software.
 
-I wasn't satisfied with current web interfaces for bacula. Cause they show default information which I can get from console and doesn't show really useful information (like big files in backup, long-running-backups etc).
+Shows information not available in standard Bacula web UIs: big files in backups, long-running jobs, pool usage, per-job backup duration charts.
 
-So as a result I start writing own web reports interface.
+## Features
+
+- **Reports**: jobs status, big files (per-server tabs, dynamic size filter), long-running backups, pool size, volume usage, backup duration chart
+- **AJAX panel**: all reports load without full page reload
+- **Charts**: Plotly-based size and file count charts per job
+- **Health check**: `/health` endpoint
+- **UI**: [Fomantic-UI 2.9.3](https://fomantic-ui.com/) + jQuery 3.7.1
 
 ## Requirements
 
-* Enabled bacula history for jobs
-* PostgreSQL database (I use postgres on all my servers with bacula)
-* python Flask
+- Python 3.8+
+- PostgreSQL with Bacula catalog
 
-## Documentation
-
-[Instalation notes](https://github.com/l13t/pyWBacula/wiki/Installation)
-
-## Notes
-
-* requirements.txt contains modules which I use in my web interface
-* css is based on [SemanticUI](http://semantic-ui.com/)
-* for database connection I use SQLAlchemy
-
-## Installation
-
-### Download
+## Quick start with Docker
 
 ```shell
 git clone https://github.com/l13t/pyWBacula.git
-```
-
-### Prepare and enable virtual enviroment
-
-```shell
 cd pyWBacula
-virtualenv venv
-source venv/bin/activate
+cp config.py.example config.py   # edit DB_URI if needed
+docker compose up --build
 ```
 
-### Install python modules
+App available at `http://localhost:15995`
 
-`pip install -r requirements.txt`
-
-### Modify configuration files
-
-After downloading you should rename next configuration files:
+## Manual installation
 
 ```shell
-cp config.py.example config.py
-cp app/config.py.example app/config.py
+git clone https://github.com/l13t/pyWBacula.git
+cd pyWBacula
+python -m venv venv && source venv/bin/activate
+pip install -r requirements.txt
 ```
 
-#### app/config.py syntax
+### Configuration
 
-* DB_URI:
+Set environment variables or edit `config.py`:
 
-```ini
-DB_URI = 'postgresql://<user>:<password>@<host>:<port>/<db_name>?client_encoding=utf8'
-```
+| Variable | Example | Description |
+|----------|---------|-------------|
+| `DB_URI` | `postgresql://bacula:bacula@localhost/bacula?client_encoding=utf8` | PostgreSQL connection string |
+| `SECRET_KEY` | `change-me` | Flask secret key |
+| `CUSTOM_PATH` | `/tmp/custom_reports/` | Path for custom report scripts |
+| `PWB_HOST` | `0.0.0.0` | Bind address |
 
-> Currently only PostgreSQL supported.
-
-## Run application
-
-### Run in standalone mode
-
-You can use _run.py_ to start application:
+### Run
 
 ```shell
-./run.py
+python run.py
+# or
+gunicorn --bind 0.0.0.0:15995 run:webapp
 ```
 
-Or you can use gunicorn:
+## Docker image
 
 ```shell
-venv/bin/gunicorn --bind 0.0.0.0:15995 run:app
+docker pull ghcr.io/l13t/pywbacula:latest
 ```
 
-### Run on startup
+Images are published to GitHub Container Registry on every release. Tags follow semver: `1.0.0`, `1.0`, `1`, `latest`.
 
-To run on startup just do next steps:
+## Releases
 
-```shell
-cp utils/pywbacula /etc/init.d/
-chmod 755 /etc/init.d/pywbacula && chown root:root /etc/init.d/pywbacula
-update-rc.d pywbacula defaults
-update-rc.d pywbacula enable
-```
+Versioning follows [Conventional Commits](https://www.conventionalcommits.org/):
 
-Edit /etc/init.d/pywbacula to change WWW\_HOME and APP\_USER variables.
-
-### Grafana+InfluxDB reports
-
-In utils you can find scripts which would help you create graph reports with Grafana+InfluxDB.
-
-* utils/bacula\_to\_influx - custom cronjob to push data to InfluxDB
-* utils/results\_to\_influx.sh - script which push data to InfluxDB
-* utils/grafana\_panel\_template.json - dashboard template for Grafana to show results
+- `fix:` → patch release
+- `feat:` → minor release
+- `feat!:` / `BREAKING CHANGE:` → major release
