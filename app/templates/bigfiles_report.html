@@ -1,41 +1,6 @@
 {%- include 'header.html' %}
 {%- include 'tables.html' %}
 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.3.16/themes/default/style.min.css">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.3.16/jstree.min.js"></script>
-
-<script>
-window.bfTrees = [];
-function buildFileTree(files, minBytes) {
-  var dirs = {}, nodes = [];
-  files.filter(function(x) { return x.real_size >= minBytes; })
-    .forEach(function(x, i) {
-      var parts = x.fname.replace(/\/+$/, '').split('/');
-      for (var j = 1; j < parts.length - 1; j++) {
-        var dp = parts.slice(0, j + 1).join('/');
-        if (!dirs[dp]) {
-          dirs[dp] = 1;
-          nodes.push({
-            id: 'dir-' + dp,
-            parent: j === 1 ? '#' : 'dir-' + parts.slice(0, j).join('/'),
-            text: parts[j],
-            icon: 'jstree-folder'
-          });
-        }
-      }
-      var fname = parts[parts.length - 1];
-      var parentPath = parts.length > 2 ? 'dir-' + parts.slice(0, parts.length - 1).join('/') : '#';
-      nodes.push({
-        id: 'file-' + i + '-' + x.real_size,
-        parent: parentPath,
-        text: fname + ' (' + x.size + ')',
-        icon: 'jstree-file'
-      });
-    });
-  return nodes;
-}
-</script>
-
 <script type="text/javascript">// <![CDATA[
 $( document ).ready(function() {
     $('.top.menu .item').tab({ history: false });
@@ -95,25 +60,29 @@ $( document ).ready(function() {
       <div class="ui warning message" id="bf-empty-{{ loop.index }}" style="display:none;">
         <i class="filter icon"></i> No files above threshold in this backup.
       </div>
-      <div id="bf-tree-{{ loop.index }}"></div>
-      <script>
-      (function(){
-        var idx = {{ loop.index }};
-        var files = {{ job_data | tojson }};
-        window.bfTrees.push(function(minMB) {
-          var minBytes = minMB * 1024 * 1024;
-          var nodes = buildFileTree(files, minBytes);
-          var fileCount = nodes.filter(function(n){ return n.icon === 'jstree-file'; }).length;
-          var badge = document.getElementById('bf-count-' + idx);
-          if (badge) badge.textContent = fileCount;
-          var emptyMsg = document.getElementById('bf-empty-' + idx);
-          if (emptyMsg) emptyMsg.style.display = (fileCount === 0) ? '' : 'none';
-          var el = $('#bf-tree-' + idx);
-          if (el.data('jstree')) el.jstree('destroy');
-          el.jstree({ core: { data: nodes, themes: { dots: true } } });
-        });
-      })();
-      </script>
+      <div style="overflow-x:auto;">
+        <table class="ui compact striped celled table"
+               id="bf-table-{{ loop.index }}" style="width:auto;min-width:500px;">
+          <thead>
+            <tr>
+              <th>Path</th>
+              <th width="120">Owner (uid:gid)</th>
+              <th width="120" class="right aligned">Size</th>
+              <th width="160">Modified</th>
+            </tr>
+          </thead>
+          <tbody>
+            {%- for f in job_data %}
+            <tr data-size="{{ f['real_size'] }}">
+              <td>{{ f['fname'] }}</td>
+              <td>{{ f['uid'] }}:{{ f['gid'] }}</td>
+              <td class="right aligned">{{ f['size'] }}</td>
+              <td>{{ f['mtime'] }}</td>
+            </tr>
+            {%- endfor %}
+          </tbody>
+        </table>
+      </div>
       {%- else %}
       <div class="ui info message">
         <i class="info circle icon"></i> No files &ge; 1 MB in last backup.
@@ -124,22 +93,46 @@ $( document ).ready(function() {
   </div>
 
   <script>
-  (function() {
+  (function () {
+    var numTabs = {{ servers | length }};
+
     function applyFilter() {
       var minMB = parseInt(document.getElementById('bf-slider').value, 10);
+      var minBytes = minMB * 1024 * 1024;
       document.getElementById('bf-size-label').textContent = minMB + ' MB';
-      window.bfTrees.forEach(function(fn) { fn(minMB); });
-      document.querySelectorAll('.bf-preset').forEach(function(btn) {
+
+      for (var i = 1; i <= numTabs; i++) {
+        var table = document.getElementById('bf-table-' + i);
+        if (!table) continue;
+        var rows = table.querySelectorAll('tbody tr');
+        var visible = 0;
+        rows.forEach(function (row) {
+          var sz = parseInt(row.dataset.size, 10);
+          if (sz >= minBytes) { row.style.display = ''; visible++; }
+          else                 { row.style.display = 'none'; }
+        });
+        var badge = document.getElementById('bf-count-' + i);
+        if (badge) badge.textContent = visible;
+        var emptyMsg = document.getElementById('bf-empty-' + i);
+        if (emptyMsg) {
+          emptyMsg.style.display = (visible === 0 && rows.length > 0) ? '' : 'none';
+        }
+      }
+
+      document.querySelectorAll('.bf-preset').forEach(function (btn) {
         btn.classList.toggle('primary', parseInt(btn.dataset.val, 10) === minMB);
       });
     }
+
     document.getElementById('bf-slider').addEventListener('input', applyFilter);
-    document.querySelectorAll('.bf-preset').forEach(function(btn) {
-      btn.addEventListener('click', function() {
+
+    document.querySelectorAll('.bf-preset').forEach(function (btn) {
+      btn.addEventListener('click', function () {
         document.getElementById('bf-slider').value = this.dataset.val;
         applyFilter();
       });
     });
+
     applyFilter();
   }());
   </script>
