@@ -23,6 +23,7 @@ services:
       SECRET_KEY: dev-only-change-in-prod
       CUSTOM_PATH: /tmp/custom_reports/
       PWB_HOST: "0.0.0.0"
+      PWB_DEBUG: "false"
     depends_on:
       db:
         condition: service_healthy

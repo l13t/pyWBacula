@@ -17,4 +17,4 @@ RUN mkdir -p /tmp/custom_reports && chmod +x docker/entrypoint.sh
 EXPOSE 15995
 
 ENTRYPOINT ["docker/entrypoint.sh"]
-CMD ["gunicorn", "--bind", "0.0.0.0:15995", "--workers", "4", "--timeout", "90", "run:webapp"]
+CMD ["gunicorn", "-c", "docker/gunicorn.conf.py", "run:webapp"]
