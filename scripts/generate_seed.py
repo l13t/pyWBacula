@@ -7,6 +7,7 @@ Usage:
 """
 from datetime import datetime, timedelta, timezone
 import os
+import sys
 
 now = datetime.now(timezone.utc).replace(microsecond=0, tzinfo=None)
 OUT = os.path.join(os.path.dirname(__file__), '..', 'docker', 'initdb', '02_seed.sql')
@@ -482,9 +483,12 @@ for i, (jobid, log_ts, logtext) in enumerate(logs):
 w()
 
 # ── Write output ──────────────────────────────────────────────────────────────
-out_path = os.path.normpath(OUT)
-os.makedirs(os.path.dirname(out_path), exist_ok=True)
-with open(out_path, 'w') as f:
-    f.write('\n'.join(lines) + '\n')
-
-print(f"Written {len(lines)} lines to {out_path}")
+out = '\n'.join(lines) + '\n'
+if '--stdout' in sys.argv:
+    sys.stdout.write(out)
+else:
+    out_path = os.path.normpath(OUT)
+    os.makedirs(os.path.dirname(out_path), exist_ok=True)
+    with open(out_path, 'w') as f:
+        f.write(out)
+    print(f"Written {len(lines)} lines to {out_path}")

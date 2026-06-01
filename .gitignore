@@ -147,3 +147,6 @@ cython_debug/
 app/static/tablesort.js
 app/static/sorts/
 app/static/jquery.address.js
+
+# Generated seed data — created at runtime by scripts/generate_seed.py
+docker/initdb/02_seed.sql

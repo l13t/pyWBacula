@@ -14,6 +14,16 @@ services:
       timeout: 5s
       retries: 10
 
+  seed:
+    build: .
+    environment:
+      PGPASSWORD: bacula
+    command: sh -c "python3 scripts/generate_seed.py --stdout | psql -h db -U bacula -d bacula"
+    restart: "no"
+    depends_on:
+      db:
+        condition: service_healthy
+
   pywbacula:
     build: .
     ports:
@@ -27,6 +37,8 @@ services:
     depends_on:
       db:
         condition: service_healthy
+      seed:
+        condition: service_completed_successfully
 
 volumes:
   pgdata:
