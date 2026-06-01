@@ -102,10 +102,10 @@ def big_files_report():
         FROM
             path, filename, file, job
         WHERE
-            job.name = '{}' AND job.jobid = file.jobid AND path.pathid = file.pathid AND
+            job.name = :job_name AND job.jobid = file.jobid AND path.pathid = file.pathid AND
             filename.filenameid = file.filenameid AND job.schedtime > NOW() - INTERVAL '24 hours'
-        """.format(job_i)
-        out_res = db.execute(query)
+        """
+        out_res = db.execute(query, {'job_name': job_i})
         proceed_result[job_i] = pwb.show_decoded_big_files_results(out_res, 1)
         sched_time[job_i] = res[1].strftime("%Y-%m-%d %H:%M:%S")
     return render_template('bigfiles_report.html',
@@ -172,9 +172,9 @@ def client_detailed_info(host_name, bdate):
     FROM
         job, client
     WHERE
-        client.clientid = job.clientid AND job.name = '{}' AND date_trunc('second', job.schedtime) = '{}'
-    """.format(host_name, bdate)
-    _short_res = db.execute(query).fetchall()
+        client.clientid = job.clientid AND job.name = :host_name AND date_trunc('second', job.schedtime) = :bdate
+    """
+    _short_res = db.execute(query, {'host_name': host_name, 'bdate': bdate}).fetchall()
     short_res = []
     for i, _short in enumerate(_short_res):
         c_name = _short[0]
@@ -200,9 +200,9 @@ def client_detailed_info(host_name, bdate):
         FROM
             path, filename, file, job
         WHERE
-            job.name = '{}' AND job.jobid = file.jobid AND date_trunc('second', job.schedtime) = '{}' AND filename.filenameid = file.filenameid AND path.pathid = file.pathid
-        """.format(host_name, bdate)
-        f_res = db.execute(f_sel).fetchall()
+            job.name = :host_name AND job.jobid = file.jobid AND date_trunc('second', job.schedtime) = :bdate AND filename.filenameid = file.filenameid AND path.pathid = file.pathid
+        """
+        f_res = db.execute(f_sel, {'host_name': host_name, 'bdate': bdate}).fetchall()
         backup_files_list = []
         for record in f_res:
             backup_files_list.append(pwb.decode_file_info(record))
@@ -243,16 +243,16 @@ def client_detailed_info(host_name, bdate):
     FROM
         client, job
     WHERE
-        client.clientid = job.clientid AND job.schedtime > NOW() - INTERVAL '14 days' AND job.name = '{}'
+        client.clientid = job.clientid AND job.schedtime > NOW() - INTERVAL '14 days' AND job.name = :host_name
     UNION SELECT
         client.name, jh.name as job_name, jh.schedtime as schedtime, jh.jobfiles, jh.jobbytes
     FROM
         client, jobhisto as jh
     WHERE
-        client.clientid = jh.clientid AND jh.schedtime > NOW() - INTERVAL '14 days' AND jh.name = '{}'
+        client.clientid = jh.clientid AND jh.schedtime > NOW() - INTERVAL '14 days' AND jh.name = :host_name
     ORDER BY schedtime
-    """.format(host_name, host_name)
-    result = db.execute(query).fetchall()
+    """
+    result = db.execute(query, {'host_name': host_name}).fetchall()
     b_s_res = []
     b_c_res = []
     for j, tmp in enumerate(result):
@@ -353,9 +353,9 @@ def old_volumes():
         FROM
             media as m
         WHERE
-            m.poolid = """ + str(_pool[pool[0]]['ppid'])
-
-        medias = db.execute(st).fetchall()
+            m.poolid = :pool_id
+        """
+        medias = db.execute(st, {'pool_id': _pool[pool[0]]['ppid']}).fetchall()
         _media = {}
         for j, media in enumerate(medias):
             if media[3] is not None:
@@ -392,11 +392,11 @@ def backup_duration(bddate):
     FROM
         pool, job
     WHERE
-        job.poolid = pool.poolid AND job.schedtime <= to_timestamp({}) AND job.schedtime >= to_timestamp({}) - INTERVAL '1 days'
+        job.poolid = pool.poolid AND job.schedtime <= to_timestamp(:bddate) AND job.schedtime >= to_timestamp(:bddate) - INTERVAL '1 days'
     GROUP BY
         pool.name, job.schedtime
-    """.format(bddate, bddate)
-    bd = db.execute(query).fetchall()
+    """
+    bd = db.execute(query, {'bddate': float(bddate)}).fetchall()
     bd_result = {}
     for bpool in bd:
         bd_result.update({bpool[0]: {'start': bpool[1], 'end': bpool[2]}})
@@ -426,8 +426,13 @@ def backup_duration(bddate):
 def show_file(fname):
     if fname == 'index':
         return redirect("/", code=302)
+    if not re.match(r'^[a-zA-Z0-9_-]+$', fname):
+        return "Not found", 404
+    safe_path = os.path.realpath(os.path.join(custom_path, fname + ".html"))
+    if not safe_path.startswith(os.path.realpath(custom_path) + os.sep):
+        return "Not found", 404
     else:
-        with open(custom_path + fname + ".html", 'r') as fi:
+        with open(safe_path, 'r') as fi:
             text = fi.read()
         title = re.compile('<title>(.*?)</title>', re.DOTALL | re.IGNORECASE).findall(text)
         text = re.sub("<head>.*?</head>", "", text, flags=re.DOTALL)
@@ -461,10 +466,10 @@ def media_report(media):
     WHERE
         p.poolid = m.poolid and
         m.storageid = s.storageid and
-        m.volumename = '""" + media + """';
+        m.volumename = :media
     """
 
-    _media_info_result = db.execute(media_info_query).fetchone()
+    _media_info_result = db.execute(media_info_query, {'media': media}).fetchone()
     media_info_result = {}
     media_info_result['volname'] = str(_media_info_result[0])
     media_info_result['poolname'] = str(_media_info_result[1])
@@ -492,15 +497,15 @@ def media_report(media):
         media as m,
         jobmedia as jm
     WHERE
-        m.volumename = '""" + media + """' and
+        m.volumename = :media and
         m.mediaid = jm.mediaid and
         jm.jobid = j.jobid
     GROUP BY
         j.jobid,
-        m.volumename;
+        m.volumename
     """
 
-    job_inside_media_result = db.execute(job_inside_media_query).fetchall()
+    job_inside_media_result = db.execute(job_inside_media_query, {'media': media}).fetchall()
     job_inside_media_list = []
 
     for jiml_id, jiml_data in enumerate(job_inside_media_result):

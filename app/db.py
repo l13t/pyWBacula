@@ -19,9 +19,9 @@ class _ResultWrapper:
 
 
 class _EngineWrapper:
-    def execute(self, query):
+    def execute(self, query, params=None):
         with _engine.connect() as conn:
-            result = conn.execute(text(query))
+            result = conn.execute(text(query), params or {})
             return _ResultWrapper(result.fetchall())
 
 
