@@ -167,7 +167,7 @@ jobs = [
     ('web-server.example.com', 'I', 1, 'T', 3,  0,  1,  7,    10800,   859832319, 0, 1, 3,  4, 1000001),
     ('web-server.example.com', 'I', 1, 'T', 2,  0,  1,  6,     9500,   751619276, 0, 1, 3,  5, 1000001),
     # jobid=6: within last 24h → file records
-    ('web-server.example.com', 'I', 1, 'T', 0, 20,  1,  5,     8200,   644245094, 0, 1, 3,  6, 1000001),
+    ('web-server.example.com', 'I', 1, 'T', 0,  6,  1,  5,     8200,   644245094, 0, 1, 3,  6, 1000001),
     # jobid=7: very recent
     ('web-server.example.com', 'I', 1, 'T', 0,  2,  1,  4,     5100,   429496729, 0, 1, 3,  7, 1000001),
     # db-server (clientid=2, filesetid=2)
@@ -177,7 +177,7 @@ jobs = [
     ('db-server.example.com',  'I', 2, 'T', 3,  0,  2, 18,    42000,  4508876800, 0, 1, 2, 11, 1000002),
     ('db-server.example.com',  'I', 2, 'T', 2,  0,  2, 20,    48000,  5154226176, 0, 1, 2, 12, 1000002),
     # jobid=13: within last 24h, has warnings
-    ('db-server.example.com',  'I', 2, 'W', 0, 20,  2, 25,    51000,  5476982784, 3, 1, 2, 13, 1000002),
+    ('db-server.example.com',  'I', 2, 'W', 0,  5,  2, 25,    51000,  5476982784, 3, 1, 2, 13, 1000002),
     # jobid=14: very recent → file records
     ('db-server.example.com',  'I', 2, 'T', 0,  3,  2, 19,    44000,  4723721216, 0, 1, 2, 14, 1000002),
     # files-server (clientid=3, filesetid=1)
@@ -188,7 +188,7 @@ jobs = [
     ('files-server.example.com', 'I', 3, 'E', 3, 0,  3,   8,       0,            0, 1, 1, 1, 19, 1000003),
     ('files-server.example.com', 'I', 3, 'T', 2, 0,  3,  35,   41000,   4398046511, 0, 1, 1, 20, 1000003),
     # jobid=21: within last 24h
-    ('files-server.example.com', 'I', 3, 'T', 0, 22, 3,  30,   38000,   4026531840, 0, 1, 1, 21, 1000003),
+    ('files-server.example.com', 'I', 3, 'T', 0,  8, 3,  30,   38000,   4026531840, 0, 1, 1, 21, 1000003),
     # jobid=22: running (endtime in future)
     ('files-server.example.com', 'I', 3, 'R', 0,  0, 28, 30,    5200,    537919488, 0, 1, 1, 22, 1000003),
     # app-server (clientid=4, filesetid=4)
@@ -197,7 +197,7 @@ jobs = [
     ('app-server.example.com',   'I', 4, 'T', 4, 0,  2,  11,    8000,    912680550, 0, 1, 4, 25, 1000004),
     ('app-server.example.com',   'I', 4, 'T', 3, 0,  2,  10,    7500,    859832319, 0, 1, 4, 26, 1000004),
     # jobid=27: within last 24h
-    ('app-server.example.com',   'I', 4, 'T', 0, 22, 2,   9,    7000,    805306368, 0, 1, 4, 27, 1000004),
+    ('app-server.example.com',   'I', 4, 'T', 0,  6, 2,   9,    7000,    805306368, 0, 1, 4, 27, 1000004),
     # jobid=28: very recent → file records
     ('app-server.example.com',   'I', 4, 'T', 0,  1, 2,   7,    6200,    644245094, 0, 1, 4, 28, 1000004),
 ]
@@ -465,11 +465,11 @@ w("INSERT INTO log (jobid, time, logtext) VALUES")
 logs = [
     (3,  ts(days=4, minutes=0),
      'web-server.example.com-fd JobId 3: Warning: /var/log/syslog: file size shrunk by 1024 bytes; not saved.'),
-    (13, ts(hours=20, minutes=0),
+    (13, ts(hours=5, minutes=0),
      'db-server.example.com-fd JobId 13: Warning: /var/lib/mysql/mysql-bin.000001: file changed.'),
-    (13, ts(hours=20, minutes=0),
+    (13, ts(hours=5, minutes=0),
      'db-server.example.com-fd JobId 13: Warning: /var/lib/mysql/mysql-bin.000002: file changed.'),
-    (13, ts(hours=20, minutes=0),
+    (13, ts(hours=5, minutes=0),
      'db-server.example.com-dir JobId 13: Warning: 3 files not saved due to file permission error.'),
     (1003, ts(days=21, minutes=0),
      'web-server.example.com-fd JobId 1003: Warning: /var/log/auth.log: file size shrunk.'),

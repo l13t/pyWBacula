@@ -2,7 +2,7 @@
 <div id="report-content" class="ui vertical stripe segment">
   <div style="padding-top: 1.5em;">
     <div class="md-card">
-      <div class="md-card-header md-card-header-info" style="height:320px;">
+      <div class="md-card-header" style="height:320px;">
         <canvas id="pools_size"></canvas>
       </div>
       <div class="md-card-body">
@@ -18,12 +18,12 @@
         options: {
           responsive: true, maintainAspectRatio: false,
           plugins: {
-            legend: { labels: { color: '#fff', boxWidth: 12 } },
+            legend: { labels: { color: '#3c4858', boxWidth: 12 } },
             tooltip: { callbacks: { label: function(c){ return c.dataset.label + ': ' + formatBytes(c.raw.y); } } }
           },
           scales: {
-            x: { type: 'timeseries', ticks: { color: 'rgba(255,255,255,.8)', maxTicksLimit: 7 }, grid: { color: 'rgba(255,255,255,.15)' } },
-            y: { ticks: { color: 'rgba(255,255,255,.8)', callback: function(v){ return formatBytes(v); } }, grid: { color: 'rgba(255,255,255,.15)' } }
+            x: { type: 'timeseries', ticks: { color: '#666', maxTicksLimit: 7 }, grid: { color: 'rgba(0,0,0,.08)' } },
+            y: { ticks: { color: '#666', callback: function(v){ return formatBytes(v); } }, grid: { color: 'rgba(0,0,0,.08)' } }
           }
         }
       });

@@ -1,3 +1,4 @@
+from datetime import datetime
 from time import gmtime, strftime
 import json
 
@@ -47,7 +48,7 @@ def gen_graph_json(ids, input_data, graph_name):
     grouped = {}
     for row in input_data:
         group = str(row[0])
-        x = str(row[1])
+        x = row[1].strftime('%Y-%m-%dT%H:%M:%S') if isinstance(row[1], datetime) else str(row[1])
         y = int(row[2]) if row[2] is not None else 0
         grouped.setdefault(group, []).append({'x': x, 'y': y})
     datasets = []
