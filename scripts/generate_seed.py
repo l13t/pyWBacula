@@ -379,7 +379,7 @@ def file_insert(jobid, records):
     w()
 
 
-# jobid=6: web-server, 20h ago
+# jobid=6: web-server, -6h
 # /var/log/nginx/access.log (50M), /var/log/nginx/error.log (15M),
 # /var/log/syslog (11M), /var/www/html/static/assets.tar.gz (100M)
 file_insert(6, [
@@ -389,7 +389,19 @@ file_insert(6, [
     (4, 13, 4, 'GQAAA'),   # /var/www/html/static/assets.tar.gz 100M pathid=13, filenameid=4
 ])
 
-# jobid=14: db-server, 3h ago
+# jobid=7: web-server, -2h
+file_insert(7, [
+    (1, 2,  1, 'DIAAA'),   # /var/log/nginx/access.log        50M
+    (2, 13, 4, 'GQAAA'),   # /var/www/html/static/assets.tar.gz 100M
+])
+
+# jobid=13: db-server, -5h (warnings)
+file_insert(13, [
+    (1, 7,  8, 'DIAAA'),   # /var/lib/mysql/binlog/mysql-bin  50M
+    (2, 6,  6, 'GQAAA'),   # /var/lib/mysql/data/ib_logfile0  100M
+])
+
+# jobid=14: db-server, -3h
 # /var/lib/mysql/ibdata1 (512M), /var/lib/mysql/data/ib_logfile0 (100M),
 # /var/lib/mysql/data/ib_logfile1 (100M), /var/lib/mysql/binlog/mysql-bin.000001 (50M),
 # /backup/database-dump.sql.gz (200M)
@@ -401,7 +413,14 @@ file_insert(14, [
     (5, 16, 9, 'MgAAA'),   # /backup/database-dump.sql.gz      200M pathid=16, filenameid=9
 ])
 
-# jobid=22: files-server, running (within 24h)
+# jobid=21: files-server, -8h
+file_insert(21, [
+    (1, 10, 11, 'MgAAA'),  # /srv/data/uploads/media-archive   200M
+    (2, 11, 12, 'GQAAA'),  # /srv/data/backups/backup-full     100M
+    (3, 8,  13, 'DIAAA'),  # /home/deploy/deploy.tar.gz        50M
+])
+
+# jobid=22: files-server, running
 # /srv/data/uploads/uploads.tar.gz (512M), /srv/data/uploads/media-archive.tar.gz (200M),
 # /srv/data/backups/backup-full.tar.gz (100M), /home/deploy/deploy.tar.gz (50M)
 file_insert(22, [
@@ -409,6 +428,12 @@ file_insert(22, [
     (2, 10, 11, 'MgAAA'),  # /srv/data/uploads/media-archive   200M pathid=10, filenameid=11
     (3, 11, 12, 'GQAAA'),  # /srv/data/backups/backup-full     100M pathid=11, filenameid=12
     (4, 8,  13, 'DIAAA'),  # /home/deploy/deploy.tar.gz        50M  pathid=8,  filenameid=13
+])
+
+# jobid=27: app-server, -6h
+file_insert(27, [
+    (1, 15, 14, 'MgAAA'),  # /opt/app/releases/release.tar.gz  200M
+    (2, 1,  15, 'sAAA'),   # /var/log/app.log                  11M
 ])
 
 # jobid=28: app-server, 1h ago
