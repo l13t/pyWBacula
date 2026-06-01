@@ -6,10 +6,6 @@ from app.db import db
 import config
 import os
 import re
-import pandas as pd
-import json
-import plotly
-import plotly.express as px
 
 reports = Blueprint('reports', __name__)
 

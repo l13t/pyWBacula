@@ -1,11 +1,13 @@
 from time import gmtime, strftime
+import json
 
 from app.db import db
-import pandas as pd
-import json
-import plotly
-import plotly.express as px
 import libs.static_vars as static_vars
+
+CHART_PALETTE = [
+    '#42a5f5', '#ef5350', '#66bb6a', '#ab47bc',
+    '#26a69a', '#ffa726', '#78909c', '#ec407a',
+]
 
 
 def application_data():
@@ -41,23 +43,26 @@ def gen_chart_array_time_3d(in_data):
     return last_result
 
 
-def gen_plotly(in_data):
-    client_data = []
-    date_data = []
-    real_data = []
-    for x, y, z in in_data:
-        client_data.append(x)
-        date_data.append(y.strftime('%Y-%m-%d %H:%M:%S'))
-        real_data.append(z)
-    return [client_data, date_data, real_data]
-
-
 def gen_graph_json(ids, input_data, graph_name):
-    graph_dict = dict(zip(ids, gen_plotly(input_data)))
-    plot_dict = pd.DataFrame(graph_dict)
-    figure_dict = px.line(plot_dict, x=ids[1], y=ids[2], color=ids[0], title=graph_name, markers=True)
-    outJSON = json.dumps(figure_dict, cls=plotly.utils.PlotlyJSONEncoder)
-    return outJSON
+    grouped = {}
+    for row in input_data:
+        group = str(row[0])
+        x = str(row[1])
+        y = int(row[2]) if row[2] is not None else 0
+        grouped.setdefault(group, []).append({'x': x, 'y': y})
+    datasets = []
+    for i, (label, data) in enumerate(grouped.items()):
+        color = CHART_PALETTE[i % len(CHART_PALETTE)]
+        datasets.append({
+            'label': label,
+            'data': data,
+            'borderColor': color,
+            'backgroundColor': color + '33',
+            'fill': False,
+            'tension': 0.1,
+            'pointRadius': 3,
+        })
+    return json.dumps({'datasets': datasets, 'title': graph_name})
 
 
 def base64_decode_lstat(record, position):

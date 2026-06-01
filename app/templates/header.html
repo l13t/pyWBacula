@@ -13,9 +13,38 @@
     <script src="https://cdn.jsdelivr.net/npm/fomantic-ui@2.9.3/dist/semantic.min.js"></script>
 
     <script type="text/javascript" src="/static/jquery.address.js"></script>
-    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.bundle.min.js" integrity="sha384-9vkpQL7Jp34QOeG9FT+pTUaGJS6mScvVqA3aqvVFcchvCHu8RfKcOCm1QOkm0AFP" crossorigin="anonymous"></script>
-    <script src="/ck/static/chartkick/chartkick.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+
+    <style type="text/css">
+      /* Material Dashboard card components */
+      .md-card { border:0; border-radius:6px; margin-bottom:20px;
+        box-shadow: 0 2px 2px 0 rgba(0,0,0,.14), 0 1px 5px 0 rgba(0,0,0,.2);
+        background:#fff; overflow:visible; }
+      .md-card-header { padding:10px 15px; margin:-20px 15px 0;
+        border-radius:3px; position:relative; }
+      .md-card-header-primary {
+        background: linear-gradient(60deg,#ab47bc,#7b1fa2);
+        box-shadow: 0 4px 20px 0 rgba(0,0,0,.14), 0 7px 10px -5px rgba(171,71,188,.4); }
+      .md-card-header-info {
+        background: linear-gradient(60deg,#26c6da,#00acc1);
+        box-shadow: 0 4px 20px 0 rgba(0,0,0,.14), 0 7px 10px -5px rgba(0,188,212,.4); }
+      .md-card-header-success {
+        background: linear-gradient(60deg,#66bb6a,#388e3c);
+        box-shadow: 0 4px 20px 0 rgba(0,0,0,.14), 0 7px 10px -5px rgba(76,175,80,.4); }
+      .md-card-body { padding:15px 20px 20px; }
+      .md-card-title { margin:8px 0 4px; font-size:1.1em; font-weight:600; color:#3c4858; }
+      .md-card-category { color:#999; font-size:.85em; margin:0; }
+    </style>
+    <script>
+      function formatBytes(b) {
+        if (b >= 1099511627776) return (b/1099511627776).toFixed(1) + ' TiB';
+        if (b >= 1073741824)    return (b/1073741824).toFixed(1) + ' GiB';
+        if (b >= 1048576)       return (b/1048576).toFixed(1) + ' MiB';
+        if (b >= 1024)          return (b/1024).toFixed(1) + ' KiB';
+        return b + ' B';
+      }
+    </script>
 
     <style type="text/css">
       body {

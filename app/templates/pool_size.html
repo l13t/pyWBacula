@@ -1,9 +1,34 @@
 {%- include 'header.html' %}
 <div id="report-content" class="ui vertical stripe segment">
-    <div id='pools_size' class='chart'”></div>
-    <script type='text/javascript'>
-      var graphs = {{ s_size | safe }};
-      Plotly.plot('pools_size',graphs,{});
+  <div style="padding-top: 1.5em;">
+    <div class="md-card">
+      <div class="md-card-header md-card-header-info" style="height:320px;">
+        <canvas id="pools_size"></canvas>
+      </div>
+      <div class="md-card-body">
+        <p class="md-card-title">Pool size history</p>
+        <p class="md-card-category">Last 28 days</p>
+      </div>
+    </div>
+    <script>
+    (function(){
+      var d = {{ s_size | safe }};
+      new Chart(document.getElementById('pools_size'), {
+        type: 'line', data: d,
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          plugins: {
+            legend: { labels: { color: '#fff', boxWidth: 12 } },
+            tooltip: { callbacks: { label: function(c){ return c.dataset.label + ': ' + formatBytes(c.raw.y); } } }
+          },
+          scales: {
+            x: { type: 'timeseries', ticks: { color: 'rgba(255,255,255,.8)', maxTicksLimit: 7 }, grid: { color: 'rgba(255,255,255,.15)' } },
+            y: { ticks: { color: 'rgba(255,255,255,.8)', callback: function(v){ return formatBytes(v); } }, grid: { color: 'rgba(255,255,255,.15)' } }
+          }
+        }
+      });
+    })();
     </script>
+  </div>
 </div>
 {%- include 'footer.html' %}
