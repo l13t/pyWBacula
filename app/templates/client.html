@@ -18,18 +18,18 @@ $( document ).ready(function() {
 </div>
 <div class="ui two column stackable grid">
   <div class="row">
-    <div class=”six wide column” style=”padding-top: 1.5em;”>
-      <div class=”md-card”>
-        <div class=”md-card-header” style=”height:200px;”>
-          <canvas id=”size_chart”></canvas>
+    <div class="six wide column" style="padding-top: 1.5em;">
+      <div class="md-card">
+        <div class="md-card-header" style="height:200px;">
+          <canvas id="size_chart"></canvas>
         </div>
-        <div class=”md-card-body”>
-          <p class=”md-card-title”>Backup size</p>
-          <p class=”md-card-category”>Last 14 days</p>
+        <div class="md-card-body">
+          <p class="md-card-title">Backup size</p>
+          <p class="md-card-category">Last 14 days</p>
         </div>
       </div>
       <script>
-      (function(){
+      $(document).ready(function(){
         var d = {{ size_result | safe }};
         new Chart(document.getElementById('size_chart'), {
           type: 'line', data: d,
@@ -45,19 +45,19 @@ $( document ).ready(function() {
             }
           }
         });
-      })();
+      });
       </script>
-      <div class=”md-card” style=”margin-top: 1em;”>
-        <div class=”md-card-header” style=”height:200px;”>
-          <canvas id=”count_chart”></canvas>
+      <div class="md-card" style="margin-top: 1em;">
+        <div class="md-card-header" style="height:200px;">
+          <canvas id="count_chart"></canvas>
         </div>
-        <div class=”md-card-body”>
-          <p class=”md-card-title”>Files per backup</p>
-          <p class=”md-card-category”>Last 14 days</p>
+        <div class="md-card-body">
+          <p class="md-card-title">Files per backup</p>
+          <p class="md-card-category">Last 14 days</p>
         </div>
       </div>
       <script>
-      (function(){
+      $(document).ready(function(){
         var d = {{ fcount_result | safe }};
         new Chart(document.getElementById('count_chart'), {
           type: 'line', data: d,
@@ -72,7 +72,7 @@ $( document ).ready(function() {
             }
           }
         });
-      })();
+      });
       </script>
     </div>
     <div class="eight wide column">
@@ -145,16 +145,14 @@ $( document ).ready(function() {
             </tr>
           </tbody>
         </table>
-      </div>
-      <div class="row">
         <h3>
           Filelist from this backup
         </h3>
-              <table class="ui fixed left aligned celled table sort" id="clfiles">
+              <table class="ui fixed left aligned celled table sort" id="clfiles-{{ loop.index0 }}">
                 <thead>
                   <tr>
                     <th class="sort-header" width="60%">Filename</th>
-                    <th class="sort-header" class="no-sort">Owner (uid:gid)</th>
+                    <th class="sort-header no-sort">Owner (uid:gid)</th>
                     <th class="sort-header">Size in MBytes</th>
                     <th class="sort-header">Last modified</th>
                   </tr>
@@ -171,7 +169,7 @@ $( document ).ready(function() {
                 </tbody>
               </table>
               <script>
-new Tablesort(document.getElementById('clfiles'));
+new Tablesort(document.getElementById('clfiles-{{ loop.index0 }}'));
               </script>
       </div>
       {% endfor %}

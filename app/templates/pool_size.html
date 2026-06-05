@@ -11,7 +11,7 @@
       </div>
     </div>
     <script>
-    (function(){
+    $(document).ready(function(){
       var d = {{ s_size | safe }};
       new Chart(document.getElementById('pools_size'), {
         type: 'line', data: d,
@@ -27,7 +27,7 @@
           }
         }
       });
-    })();
+    });
     </script>
   </div>
 </div>

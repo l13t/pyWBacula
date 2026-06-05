@@ -1,3 +1,5 @@
+import os
+
 JobType = {
     'B': '<div class="ui green label">Backup Job</div>',
     'M': '<div class="ui violet label">Migrated Job</div>',
@@ -72,7 +74,7 @@ app_info = {
     "maintainer": "Dmytro Prokhorenkov",
     "git_repo": "https://github.com/l13t/pyWBacula",
     "__credits__": ["Dmytro Prokhorenkov"],
-    "__version__": "0.3.0",
+    "__version__": os.environ.get("APP_VERSION", "dev"),
     "__maintainer__": "Dmytro Prokhorenkov",
     "__email__": "liet@liet.kiev.ua",
     "__status__": "Development"

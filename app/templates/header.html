@@ -13,8 +13,8 @@
     <script src="https://cdn.jsdelivr.net/npm/fomantic-ui@2.9.3/dist/semantic.min.js"></script>
 
     <script type="text/javascript" src="/static/jquery.address.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+    <script src="/static/chart.js"></script>
+    <script src="/static/chartjs-adapter-date-fns.bundle.js"></script>
 
     <style type="text/css">
       /* Material Dashboard card components */
@@ -125,13 +125,35 @@
 
   </head>
   <body>
+    {% set default_reports_menu = [
+      {'name': 'Jobs', 'url': '/reports/jobs', 'icon': 'tasks', 'title': 'Latest status per job name'},
+      {'name': 'Big Files', 'url': '/reports/big_files', 'icon': 'hdd', 'title': 'Files larger than 10 MB in last backup'},
+      {'name': 'Pool Size', 'url': '/reports/pool_size_report', 'icon': 'chart bar outline', 'title': 'Backup size per pool over last 28 days'},
+      {'name': 'Long Running', 'url': '/reports/long_running_backup', 'icon': 'clock outline', 'title': 'Jobs running longer than 30 minutes'},
+      {'name': 'Volumes', 'url': '/reports/old_volumes', 'icon': 'archive', 'title': 'Tape/disk volume status and usage'},
+      {'name': 'Duration', 'url': '/reports/backup_duration', 'icon': 'calendar alternate outline', 'title': 'Backup start/end time chart'}
+    ] %}
+    {% set top_reports_menu = reports_menu if reports_menu is defined and reports_menu else default_reports_menu %}
+
     <div class="ui large inverted teal menu">
       <a href="/home" class="brand item">
         <i class="database icon"></i> pyWBacula
       </a>
-      <a href="/reports" class="item">
+      <div class="ui dropdown item">
         <i class="list alternate outline icon"></i> Reports
-      </a>
+        <i class="dropdown icon"></i>
+        <div class="menu">
+          <a class="item" href="/reports">
+            <i class="list icon"></i> Reports List
+          </a>
+          <div class="divider"></div>
+          {% for report_item in top_reports_menu %}
+          <a class="item" href="{{ report_item['url'] }}" title="{{ report_item['title'] }}">
+            <i class="{{ report_item['icon'] }} icon"></i> {{ report_item['name'] }}
+          </a>
+          {% endfor %}
+        </div>
+      </div>
       <div class="right menu">
         <a href="/health" class="item" title="Health check">
           <i class="heartbeat icon"></i>
@@ -141,3 +163,17 @@
         </a>
       </div>
     </div>
+    {% if report_breadcrumb is defined and report_breadcrumb %}
+    <div class="ui small breadcrumb" style="margin: 0 0 1.5em 0;">
+      {% for breadcrumb_item in report_breadcrumb %}
+        {% if breadcrumb_item['url'] %}
+          <a class="section" href="{{ breadcrumb_item['url'] }}">{{ breadcrumb_item['name'] }}</a>
+        {% else %}
+          <div class="active section">{{ breadcrumb_item['name'] }}</div>
+        {% endif %}
+        {% if not loop.last %}
+          <i class="right angle icon divider"></i>
+        {% endif %}
+      {% endfor %}
+    </div>
+    {% endif %}

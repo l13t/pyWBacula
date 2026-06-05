@@ -12,10 +12,62 @@ reports = Blueprint('reports', __name__)
 custom_path = config.CUSTOM_PATH
 
 
+def _report_menu_items():
+    return [
+        {'name': 'Jobs', 'url': '/reports/jobs', 'icon': 'tasks', 'title': 'Latest status per job name'},
+        {'name': 'Big Files', 'url': '/reports/big_files', 'icon': 'hdd', 'title': 'Files larger than 10 MB in last backup'},
+        {'name': 'Pool Size', 'url': '/reports/pool_size_report', 'icon': 'chart bar outline', 'title': 'Backup size per pool over last 28 days'},
+        {'name': 'Long Running', 'url': '/reports/long_running_backup', 'icon': 'clock outline', 'title': 'Jobs running longer than 30 minutes'},
+        {'name': 'Volumes', 'url': '/reports/old_volumes', 'icon': 'archive', 'title': 'Tape/disk volume status and usage'},
+        {'name': 'Duration', 'url': '/reports/backup_duration', 'icon': 'calendar alternate outline', 'title': 'Backup start/end time chart'},
+    ]
+
+
+def _build_report_breadcrumb():
+    if request.blueprint != 'reports':
+        return []
+
+    crumb = [{'name': 'Reports', 'url': '/reports'}]
+    endpoint = request.endpoint or ''
+    view_args = request.view_args or {}
+
+    endpoint_names = {
+        'reports.jobs_report': 'Jobs',
+        'reports.big_files_report': 'Big Files',
+        'reports.pool_size_report': 'Pool Size',
+        'reports.long_running_backups': 'Long Running',
+        'reports.old_volumes': 'Volumes',
+        'reports.backup_duration': 'Duration',
+    }
+
+    if endpoint == 'reports.show_reports':
+        return crumb
+    if endpoint in endpoint_names:
+        crumb.append({'name': endpoint_names[endpoint], 'url': None})
+        return crumb
+    if endpoint == 'reports.client_detailed_info':
+        crumb.append({'name': 'Client', 'url': None})
+        host_name = view_args.get('host_name')
+        if host_name:
+            crumb.append({'name': host_name, 'url': None})
+        return crumb
+    if endpoint == 'reports.media_report':
+        crumb.append({'name': 'Volume', 'url': None})
+        media = view_args.get('media')
+        if media:
+            crumb.append({'name': media, 'url': None})
+        return crumb
+    if endpoint == 'reports.show_file':
+        fname = view_args.get('fname')
+        crumb.append({'name': fname if fname else 'Custom', 'url': None})
+        return crumb
+
+    return crumb
+
+
 @reports.route('/reports', methods=['GET'])
 def show_reports():
-    unix_today = int(mktime(gmtime()))
-    return render_template('reports.html', title='Available reports list', unix_date=unix_today)
+    return render_template('reports.html', title='Available reports list')
 
 
 @reports.route('/reports/jobs', methods=['GET', 'POST'])
@@ -418,6 +470,11 @@ def backup_duration(bddate):
                            max_date=max_date)
 
 
+@reports.route('/reports/backup_duration', methods=['GET'])
+def backup_duration_today():
+    return redirect('/reports/backup_duration/' + str(int(mktime(gmtime()))), code=302)
+
+
 @reports.route('/<fname>.html', methods=['GET'])
 def show_file(fname):
     if fname == 'index':
@@ -518,4 +575,7 @@ def media_report(media):
 
 @reports.context_processor
 def inject_app_info():
-    return static_vars.app_info
+    context = dict(static_vars.app_info)
+    context['reports_menu'] = _report_menu_items()
+    context['report_breadcrumb'] = _build_report_breadcrumb()
+    return context

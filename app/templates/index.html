@@ -46,7 +46,7 @@
         </div>
       </div>
       <script>
-      (function(){
+      $(document).ready(function(){
         var d = {{ b_size | safe }};
         new Chart(document.getElementById('size_chart'), {
           type: 'line', data: d,
@@ -62,7 +62,7 @@
             }
           }
         });
-      })();
+      });
       </script>
     </div>
     <div class="column">
@@ -76,7 +76,7 @@
         </div>
       </div>
       <script>
-      (function(){
+      $(document).ready(function(){
         var d = {{ b_count | safe }};
         new Chart(document.getElementById('count_chart'), {
           type: 'line', data: d,
@@ -91,7 +91,7 @@
             }
           }
         });
-      })();
+      });
       </script>
     </div>
   </div>

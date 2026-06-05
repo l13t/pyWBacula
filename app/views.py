@@ -19,7 +19,7 @@ envdump = EnvironmentDump()
 health.add_check(pwb.db_available)
 envdump.add_section("application", pwb.application_data)
 
-statics.add_url_rule("/health", "healthcheck", view_func=lambda: health.run())
+statics.add_url_rule("/ready", "readycheck", view_func=lambda: health.run())
 statics.add_url_rule("/env", "environment", view_func=lambda: envdump.run())
 
 
@@ -97,8 +97,8 @@ def about_page():
 
 
 @statics.route('/health', methods=['GET'])
-def pwb_health():
-    return render_template("ok_mon_server.html", title="Home page")
+def liveness():
+    return '', 200
 
 
 @statics.context_processor

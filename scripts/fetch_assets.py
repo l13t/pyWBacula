@@ -3,6 +3,14 @@ import urllib.request
 
 ASSETS = [
     (
+        "https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js",
+        "app/static/chart.js",
+    ),
+    (
+        "https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js",
+        "app/static/chartjs-adapter-date-fns.bundle.js",
+    ),
+    (
         "https://cdn.jsdelivr.net/npm/tablesort@5.3.0/dist/tablesort.min.js",
         "app/static/tablesort.js",
     ),
