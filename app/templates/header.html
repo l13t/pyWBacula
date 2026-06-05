@@ -13,9 +13,38 @@
     <script src="https://cdn.jsdelivr.net/npm/fomantic-ui@2.9.3/dist/semantic.min.js"></script>
 
     <script type="text/javascript" src="/static/jquery.address.js"></script>
-    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.bundle.min.js" integrity="sha384-9vkpQL7Jp34QOeG9FT+pTUaGJS6mScvVqA3aqvVFcchvCHu8RfKcOCm1QOkm0AFP" crossorigin="anonymous"></script>
-    <script src="/ck/static/chartkick/chartkick.js"></script>
+    <script src="/static/chart.js"></script>
+    <script src="/static/chartjs-adapter-date-fns.bundle.js"></script>
+
+    <style type="text/css">
+      /* Material Dashboard card components */
+      .md-card { border:0; border-radius:6px; margin-bottom:20px;
+        box-shadow: 0 2px 2px 0 rgba(0,0,0,.14), 0 1px 5px 0 rgba(0,0,0,.2);
+        background:#fff; overflow:visible; }
+      .md-card-header { padding:10px 15px; margin:-20px 15px 0;
+        border-radius:3px; position:relative; }
+      .md-card-header-primary {
+        background: linear-gradient(60deg,#ab47bc,#7b1fa2);
+        box-shadow: 0 4px 20px 0 rgba(0,0,0,.14), 0 7px 10px -5px rgba(171,71,188,.4); }
+      .md-card-header-info {
+        background: linear-gradient(60deg,#26c6da,#00acc1);
+        box-shadow: 0 4px 20px 0 rgba(0,0,0,.14), 0 7px 10px -5px rgba(0,188,212,.4); }
+      .md-card-header-success {
+        background: linear-gradient(60deg,#66bb6a,#388e3c);
+        box-shadow: 0 4px 20px 0 rgba(0,0,0,.14), 0 7px 10px -5px rgba(76,175,80,.4); }
+      .md-card-body { padding:15px 20px 20px; }
+      .md-card-title { margin:8px 0 4px; font-size:1.1em; font-weight:600; color:#3c4858; }
+      .md-card-category { color:#999; font-size:.85em; margin:0; }
+    </style>
+    <script>
+      function formatBytes(b) {
+        if (b >= 1099511627776) return (b/1099511627776).toFixed(1) + ' TiB';
+        if (b >= 1073741824)    return (b/1073741824).toFixed(1) + ' GiB';
+        if (b >= 1048576)       return (b/1048576).toFixed(1) + ' MiB';
+        if (b >= 1024)          return (b/1024).toFixed(1) + ' KiB';
+        return b + ' B';
+      }
+    </script>
 
     <style type="text/css">
       body {
@@ -96,13 +125,35 @@
 
   </head>
   <body>
+    {% set default_reports_menu = [
+      {'name': 'Jobs', 'url': '/reports/jobs', 'icon': 'tasks', 'title': 'Latest status per job name'},
+      {'name': 'Big Files', 'url': '/reports/big_files', 'icon': 'hdd', 'title': 'Files larger than 10 MB in last backup'},
+      {'name': 'Pool Size', 'url': '/reports/pool_size_report', 'icon': 'chart bar outline', 'title': 'Backup size per pool over last 28 days'},
+      {'name': 'Long Running', 'url': '/reports/long_running_backup', 'icon': 'clock outline', 'title': 'Jobs running longer than 30 minutes'},
+      {'name': 'Volumes', 'url': '/reports/old_volumes', 'icon': 'archive', 'title': 'Tape/disk volume status and usage'},
+      {'name': 'Duration', 'url': '/reports/backup_duration', 'icon': 'calendar alternate outline', 'title': 'Backup start/end time chart'}
+    ] %}
+    {% set top_reports_menu = reports_menu if reports_menu is defined and reports_menu else default_reports_menu %}
+
     <div class="ui large inverted teal menu">
       <a href="/home" class="brand item">
         <i class="database icon"></i> pyWBacula
       </a>
-      <a href="/reports" class="item">
+      <div class="ui dropdown item">
         <i class="list alternate outline icon"></i> Reports
-      </a>
+        <i class="dropdown icon"></i>
+        <div class="menu">
+          <a class="item" href="/reports">
+            <i class="list icon"></i> Reports List
+          </a>
+          <div class="divider"></div>
+          {% for report_item in top_reports_menu %}
+          <a class="item" href="{{ report_item['url'] }}" title="{{ report_item['title'] }}">
+            <i class="{{ report_item['icon'] }} icon"></i> {{ report_item['name'] }}
+          </a>
+          {% endfor %}
+        </div>
+      </div>
       <div class="right menu">
         <a href="/health" class="item" title="Health check">
           <i class="heartbeat icon"></i>
@@ -112,3 +163,17 @@
         </a>
       </div>
     </div>
+    {% if report_breadcrumb is defined and report_breadcrumb %}
+    <div class="ui small breadcrumb" style="margin: 0 0 1.5em 0;">
+      {% for breadcrumb_item in report_breadcrumb %}
+        {% if breadcrumb_item['url'] %}
+          <a class="section" href="{{ breadcrumb_item['url'] }}">{{ breadcrumb_item['name'] }}</a>
+        {% else %}
+          <div class="active section">{{ breadcrumb_item['name'] }}</div>
+        {% endif %}
+        {% if not loop.last %}
+          <i class="right angle icon divider"></i>
+        {% endif %}
+      {% endfor %}
+    </div>
+    {% endif %}

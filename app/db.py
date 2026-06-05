@@ -1,7 +1,8 @@
 from sqlalchemy import create_engine, text
 import config
 
-_engine = create_engine(config.DB_URI, echo=True)
+_debug = getattr(config, 'DEBUG', False)
+_engine = create_engine(config.DB_URI, echo=_debug)
 
 
 class _ResultWrapper:

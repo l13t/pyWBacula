@@ -1,4 +1,3 @@
-chartkick
 Flask
 flask_debug
 Flask-SQLAlchemy
@@ -6,7 +5,5 @@ gunicorn
 Jinja2
 psycopg2-binary
 py-healthcheck
-pandas
-plotly
 SQLAlchemy>=2.0
 werkzeug>=3.0.1

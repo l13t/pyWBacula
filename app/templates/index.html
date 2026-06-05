@@ -34,24 +34,65 @@
   <div class="ui divider"></div>
 
   <!-- Charts row -->
-  <div class="ui two column stackable grid" style="margin-bottom: 1em;">
+  <div class="ui two column stackable grid" style="margin-bottom: 1em; padding-top: 1.5em;">
     <div class="column">
-      <div class="ui segment">
-        <h4 class="ui header"><i class="database icon"></i> Backup size (28 days)</h4>
-        <div id="size_chart"></div>
-        <script>
-          Plotly.plot('size_chart', {{ b_size | safe }}, {margin: {t:10, b:40}, height: 320});
-        </script>
+      <div class="md-card">
+        <div class="md-card-header" style="height:220px;">
+          <canvas id="size_chart"></canvas>
+        </div>
+        <div class="md-card-body">
+          <p class="md-card-title"><i class="database icon"></i> Backup size</p>
+          <p class="md-card-category">Last 28 days by client</p>
+        </div>
       </div>
+      <script>
+      $(document).ready(function(){
+        var d = {{ b_size | safe }};
+        new Chart(document.getElementById('size_chart'), {
+          type: 'line', data: d,
+          options: {
+            responsive: true, maintainAspectRatio: false,
+            plugins: {
+              legend: { labels: { color: '#3c4858', boxWidth: 12 } },
+              tooltip: { callbacks: { label: function(c){ return c.dataset.label + ': ' + formatBytes(c.raw.y); } } }
+            },
+            scales: {
+              x: { type: 'timeseries', ticks: { color: '#666', maxTicksLimit: 7 }, grid: { color: 'rgba(0,0,0,.08)' } },
+              y: { ticks: { color: '#666', callback: function(v){ return formatBytes(v); } }, grid: { color: 'rgba(0,0,0,.08)' } }
+            }
+          }
+        });
+      });
+      </script>
     </div>
     <div class="column">
-      <div class="ui segment">
-        <h4 class="ui header"><i class="copy outline icon"></i> Files per backup (28 days)</h4>
-        <div id="count_chart"></div>
-        <script>
-          Plotly.plot('count_chart', {{ b_count | safe }}, {margin: {t:10, b:40}, height: 320});
-        </script>
+      <div class="md-card">
+        <div class="md-card-header" style="height:220px;">
+          <canvas id="count_chart"></canvas>
+        </div>
+        <div class="md-card-body">
+          <p class="md-card-title"><i class="copy outline icon"></i> Files per backup</p>
+          <p class="md-card-category">Last 28 days by client</p>
+        </div>
       </div>
+      <script>
+      $(document).ready(function(){
+        var d = {{ b_count | safe }};
+        new Chart(document.getElementById('count_chart'), {
+          type: 'line', data: d,
+          options: {
+            responsive: true, maintainAspectRatio: false,
+            plugins: {
+              legend: { labels: { color: '#3c4858', boxWidth: 12 } }
+            },
+            scales: {
+              x: { type: 'timeseries', ticks: { color: '#666', maxTicksLimit: 7 }, grid: { color: 'rgba(0,0,0,.08)' } },
+              y: { ticks: { color: '#666' }, grid: { color: 'rgba(0,0,0,.08)' } }
+            }
+          }
+        });
+      });
+      </script>
     </div>
   </div>
 

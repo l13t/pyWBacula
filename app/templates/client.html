@@ -18,16 +18,61 @@ $( document ).ready(function() {
 </div>
 <div class="ui two column stackable grid">
   <div class="row">
-    <div class="six wide column">
-      <div id='size_chart' class='chart'”></div>
-      <script type='text/javascript'>
-        var graphs = {{ size_result | safe }};
-        Plotly.plot('size_chart',graphs,{});
+    <div class="six wide column" style="padding-top: 1.5em;">
+      <div class="md-card">
+        <div class="md-card-header" style="height:200px;">
+          <canvas id="size_chart"></canvas>
+        </div>
+        <div class="md-card-body">
+          <p class="md-card-title">Backup size</p>
+          <p class="md-card-category">Last 14 days</p>
+        </div>
+      </div>
+      <script>
+      $(document).ready(function(){
+        var d = {{ size_result | safe }};
+        new Chart(document.getElementById('size_chart'), {
+          type: 'line', data: d,
+          options: {
+            responsive: true, maintainAspectRatio: false,
+            plugins: {
+              legend: { labels: { color: '#3c4858', boxWidth: 12 } },
+              tooltip: { callbacks: { label: function(c){ return c.dataset.label + ': ' + formatBytes(c.raw.y); } } }
+            },
+            scales: {
+              x: { type: 'timeseries', ticks: { color: '#666', maxTicksLimit: 5 }, grid: { color: 'rgba(0,0,0,.08)' } },
+              y: { ticks: { color: '#666', callback: function(v){ return formatBytes(v); } }, grid: { color: 'rgba(0,0,0,.08)' } }
+            }
+          }
+        });
+      });
       </script>
-      <div id='count_chart' class='chart'”></div>
-      <script type='text/javascript'>
-        var graphs = {{ fcount_result | safe }};
-        Plotly.plot('count_chart',graphs,{});
+      <div class="md-card" style="margin-top: 1em;">
+        <div class="md-card-header" style="height:200px;">
+          <canvas id="count_chart"></canvas>
+        </div>
+        <div class="md-card-body">
+          <p class="md-card-title">Files per backup</p>
+          <p class="md-card-category">Last 14 days</p>
+        </div>
+      </div>
+      <script>
+      $(document).ready(function(){
+        var d = {{ fcount_result | safe }};
+        new Chart(document.getElementById('count_chart'), {
+          type: 'line', data: d,
+          options: {
+            responsive: true, maintainAspectRatio: false,
+            plugins: {
+              legend: { labels: { color: '#3c4858', boxWidth: 12 } }
+            },
+            scales: {
+              x: { type: 'timeseries', ticks: { color: '#666', maxTicksLimit: 5 }, grid: { color: 'rgba(0,0,0,.08)' } },
+              y: { ticks: { color: '#666' }, grid: { color: 'rgba(0,0,0,.08)' } }
+            }
+          }
+        });
+      });
       </script>
     </div>
     <div class="eight wide column">
@@ -100,16 +145,14 @@ $( document ).ready(function() {
             </tr>
           </tbody>
         </table>
-      </div>
-      <div class="row">
         <h3>
           Filelist from this backup
         </h3>
-              <table class="ui fixed left aligned celled table sort" id="clfiles">
+              <table class="ui fixed left aligned celled table sort" id="clfiles-{{ loop.index0 }}">
                 <thead>
                   <tr>
                     <th class="sort-header" width="60%">Filename</th>
-                    <th class="sort-header" class="no-sort">Owner (uid:gid)</th>
+                    <th class="sort-header no-sort">Owner (uid:gid)</th>
                     <th class="sort-header">Size in MBytes</th>
                     <th class="sort-header">Last modified</th>
                   </tr>
@@ -126,7 +169,7 @@ $( document ).ready(function() {
                 </tbody>
               </table>
               <script>
-new Tablesort(document.getElementById('clfiles'));
+new Tablesort(document.getElementById('clfiles-{{ loop.index0 }}'));
               </script>
       </div>
       {% endfor %}

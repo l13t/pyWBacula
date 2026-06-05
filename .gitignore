@@ -144,6 +144,11 @@ cython_debug/
 /config.py
 
 # Frontend assets fetched at build time (see scripts/fetch_assets.sh)
+app/static/chart.js
+app/static/chartjs-adapter-date-fns.bundle.js
 app/static/tablesort.js
 app/static/sorts/
 app/static/jquery.address.js
+
+# Generated seed data — created at runtime by scripts/generate_seed.py
+docker/initdb/02_seed.sql
